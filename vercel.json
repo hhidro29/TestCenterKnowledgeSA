@@ -4,7 +4,7 @@
   ],
   "functions": {
     "api/[...path].mjs": {
-      "includeFiles": "**/*.md",
+      "includeFiles": "**/*.{md,txt}",
       "maxDuration": 30
     }
   }
