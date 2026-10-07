@@ -285,8 +285,14 @@ async function handle(req, res) {
 }
 
 await loadData();
-http.createServer(handle).listen(PORT, HOST, () => {
-  console.log(`Knowledge chatbot prototype: http://${HOST}:${PORT}`);
-  console.log(`Local documents loaded: ${localDocs.length}`);
-  console.log(`AI provider: ${AI_PROVIDER} · model: ${GEMINI_MODEL} · ${GEMINI_API_KEY ? "enabled" : "demo-local mode"}`);
-});
+
+export { handle };
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+if (isMain) {
+  http.createServer(handle).listen(PORT, HOST, () => {
+    console.log(`Knowledge chatbot prototype: http://${HOST}:${PORT}`);
+    console.log(`Local documents loaded: ${localDocs.length}`);
+    console.log(`AI provider: ${AI_PROVIDER} · model: ${GEMINI_MODEL} · ${GEMINI_API_KEY ? "enabled" : "demo-local mode"}`);
+  });
+}

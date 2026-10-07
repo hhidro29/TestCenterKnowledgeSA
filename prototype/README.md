@@ -33,7 +33,7 @@ Repository sudah memiliki `render.yaml` di root. Di Render pilih **New Blueprint
 Variabel yang dipakai:
 
 - `GEMINI_API_KEY`: wajib untuk jawaban AI.
-- `GEMINI_MODEL`: default `gemini-2.5-flash-lite`.
+- `GEMINI_MODEL`: default `gemini-3.5-flash-lite`.
 - `MAX_REQUESTS_PER_MINUTE`: batas sederhana per alamat IP, default 30.
 
 ## Cara kerja

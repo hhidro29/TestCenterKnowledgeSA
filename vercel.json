@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/prototype/public/index.html" }
+  ],
+  "functions": {
+    "api/[...path].mjs": {
+      "includeFiles": [
+        "knowledge-base/**",
+        "Prompt Sistem Chatbot - Knowledge Base Terstruktur.md"
+      ],
+      "maxDuration": 30
+    }
+  }
+}

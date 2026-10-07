@@ -16,7 +16,16 @@ Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk j
 
 ## Deploy publik
 
-File `render.yaml` sudah disiapkan untuk Render. Hubungkan repository GitHub ini sebagai Blueprint, lalu isi secret `GEMINI_API_KEY`. Render akan menjalankan aplikasi dari folder `prototype/` dan memberi URL publik.
+Repository ini juga sudah memiliki konfigurasi Vercel. Import repository di Vercel dengan **Root Directory** tetap di root repository, lalu tambahkan environment variable berikut pada **Production** dan **Preview**:
+
+```text
+AI_PROVIDER=gemini
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-3.5-flash-lite
+MAX_REQUESTS_PER_MINUTE=30
+```
+
+Setelah **Redeploy**, endpoint `/api/config` harus menampilkan `mode: "gemini"`. `GEMINI_API_KEY` tidak boleh ditulis di frontend atau di-commit ke repository.
 
 ## Knowledge base
 
