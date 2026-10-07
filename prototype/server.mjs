@@ -95,6 +95,11 @@ function queryTerms(query) {
   return [...new Set(normalize(query).split(/\s+/).filter((term) => term.length > 2 && !STOPWORDS.has(term)))];
 }
 
+function isGreeting(query) {
+  const value = normalize(query).trim();
+  return /^(halo|hai|hi|hello|hey|pagi|siang|sore|malam|terima kasih|makasih|thanks|thank you)[!.?\s]*$/.test(value);
+}
+
 function cleanExcerpt(value) {
   return String(value || "")
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
@@ -143,7 +148,7 @@ function retrieve(query) {
     profile: PROFILE_LABELS[doc.metadata.profile_id] || doc.metadata.profile || "Knowledge base",
     status: doc.metadata.source_status || "verified_extracted",
     url: doc.metadata.source_url || "",
-  }));
+  })).filter((source, index, all) => all.findIndex((item) => item.title === source.title && item.path === source.path) === index).slice(0, 4);
   const excerpts = candidates
     .map((doc) => ({ title: doc.title, path: doc.relative, lines: relevantExcerpts(doc, terms) }))
     .filter((item) => item.lines.length);
@@ -175,12 +180,12 @@ function localSearch(query) {
 }
 
 function buildPrompt(message, context) {
-  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.\n- Jika menyebut sumber, gunakan judul dokumen yang tersedia.\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
+  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
 }
 
 async function callGemini({ message, history = [] }) {
   if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY belum dikonfigurasi.");
-  const retrieved = retrieve(message);
+  const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
   const contents = [
     ...history.slice(-10).map((item) => ({
       role: item.role === "assistant" ? "model" : "user",
