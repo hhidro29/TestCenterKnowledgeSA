@@ -27,6 +27,8 @@ GROQ_MODEL=qwen/qwen3.8-27b
 
 Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun Groq. API key hanya dibaca server; jangan menaruh nilainya di GitHub. Untuk kembali ke Gemini, gunakan `AI_PROVIDER=gemini` dan `GEMINI_API_KEY`.
 
+Jika kedua key tersedia, dropdown di UI menampilkan Qwen dan Gemini sekaligus. Model dipilih per pesan; riwayat chat tetap dikirim agar percakapan bisa dilanjutkan saat berpindah model.
+
 ## Deploy publik dengan Render
 
 Repository sudah memiliki `render.yaml` di root. Di Render pilih **New Blueprint**, hubungkan repository GitHub ini, lalu isi secret `GEMINI_API_KEY` ketika diminta. Render akan memakai `prototype/` sebagai root, menjalankan `npm install` dan `npm start`, lalu memberi URL publik.

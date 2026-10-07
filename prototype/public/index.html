@@ -19,9 +19,8 @@
       .presence-dot { width:7px; height:7px; border-radius:50%; background:#efad42; }
       .presence-dot.ready { background:#1ca36e; }
       .controls { display:flex; align-items:center; gap:10px; }
-      .model-badge { display:flex; align-items:center; gap:7px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; color:var(--ink); background:#f8fafc; font-size:11px; }
-      .model-badge span { color:var(--muted); font-weight:800; }
-      .model-badge strong { font-size:11px; font-weight:800; }
+      .model-picker { display:flex; align-items:center; gap:7px; padding:4px 8px 4px 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:#f8fafc; font-size:11px; font-weight:800; }
+      .model-picker select { max-width:220px; padding:5px 22px 5px 3px; border:0; outline:0; color:var(--ink); background:transparent; font-size:11px; font-weight:800; }
       .more { width:34px; height:34px; border:0; color:var(--muted); background:transparent; border-radius:50%; font-size:22px; cursor:pointer; }
       .more:hover { background:#f2f5f9; }
       .conversation { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--chat); }
@@ -60,7 +59,7 @@
       .send:hover { background:var(--blue-dark); }
       .send:disabled { opacity:.55; cursor:wait; }
       .note { max-width:none; margin:6px 0 0; color:#9aa5b4; text-align:right; font-size:10px; }
-      @media (max-width:700px) { .topbar { padding:10px 12px; } .model-badge { padding:8px; } .model-badge span { display:none; } .more { display:none; } .messages { padding:14px 10px 10px; } .msg-row { max-width:89%; } .welcome { margin:auto 6px; } .composer-zone { padding:9px 7px 11px; } .icon-button { display:none; } }
+      @media (max-width:700px) { .topbar { padding:10px 12px; } .model-picker { padding:4px 6px; } .model-picker span { display:none; } .model-picker select { max-width:145px; } .more { display:none; } .messages { padding:14px 10px 10px; } .msg-row { max-width:89%; } .welcome { margin:auto 6px; } .composer-zone { padding:9px 7px 11px; } .icon-button { display:none; } }
     </style>
   </head>
   <body>
@@ -70,7 +69,7 @@
           <div class="avatar">BA</div>
           <div><div class="name">Brain Academy Assistant</div><div class="presence"><span class="presence-dot" id="statusDot"></span><span id="statusText">Memeriksa koneksi…</span></div></div>
         </div>
-        <div class="controls"><div class="model-badge"><span>Model</span><strong id="modelName">memuat…</strong></div><button class="more" type="button" aria-label="Info">⋮</button></div>
+        <div class="controls"><label class="model-picker"><span>Model</span><select id="model" aria-label="Pilih model"></select></label><button class="more" type="button" aria-label="Info">⋮</button></div>
       </header>
       <section class="conversation">
         <div class="messages" id="messages">
@@ -88,7 +87,7 @@
       const emptyEl = document.getElementById('empty');
       const inputEl = document.getElementById('input');
       const sendEl = document.getElementById('send');
-      const modelName = document.getElementById('modelName');
+      const modelEl = document.getElementById('model');
       const statusText = document.getElementById('statusText');
       const statusDot = document.getElementById('statusDot');
       const modeNote = document.getElementById('modeNote');
@@ -144,16 +143,19 @@
         sources.forEach((source) => { const card = document.createElement('div'); card.className = 'source'; const title = document.createElement('strong'); title.textContent = source.title || source.filename || 'Sumber'; const meta = document.createElement('span'); meta.textContent = `${source.profile || 'Knowledge base'} · ${source.status || 'citation'}`; card.append(title, meta); wrap.appendChild(card); });
         messagesEl.appendChild(wrap); messagesEl.scrollTop = messagesEl.scrollHeight;
       }
-      async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); modelName.textContent = config.defaultModel || 'model gratis'; const live = Boolean(config.hasApiKey && config.mode !== 'demo-local'); statusText.textContent = live ? `AI tersambung · ${config.mode}` : 'mode demo lokal'; statusDot.classList.toggle('ready', live); modeNote.textContent = `${live ? `${config.mode} · ${config.defaultModel}` : 'Demo lokal'} · ${config.localDocuments} dokumen · knowledge base aktif`; }
+      async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); (config.models || []).forEach((model) => { const opt = document.createElement('option'); const id = typeof model === 'string' ? model : model.id; opt.value = id; opt.textContent = typeof model === 'string' ? model : model.label; opt.disabled = typeof model !== 'string' && !model.available; if (opt.disabled) opt.textContent += ' · belum dikonfigurasi'; modelEl.appendChild(opt); }); modelEl.value = config.defaultModel; const live = Boolean(config.hasApiKey && config.mode !== 'demo-local'); statusText.textContent = live ? `AI tersambung · ${config.mode}` : 'mode demo lokal'; statusDot.classList.toggle('ready', live); updateModelNote(config); return config; }
+      function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · ${config?.localDocuments || 58} dokumen · knowledge base aktif`; }
+      let configState = null;
+      modelEl.addEventListener('change', () => updateModelNote(configState));
       document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { inputEl.value = button.textContent; inputEl.focus(); }));
       inputEl.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.getElementById('composer').requestSubmit(); } });
       document.getElementById('composer').addEventListener('submit', async (event) => {
         event.preventDefault(); const message = inputEl.value.trim(); if (!message) return;
         addMessage('user', message, 'Anda'); inputEl.value = ''; sendEl.disabled = true; sendEl.textContent = '…';
-        try { const response = await fetch('/api/chat', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ message, history }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); addSources(data.sources || data.citations || []); }
+        try { const response = await fetch('/api/chat', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ message, model:modelEl.value, history }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); addSources(data.sources || data.citations || []); }
         catch (error) { addMessage('assistant', `Terjadi kendala: ${error.message}`, 'Error'); } finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
       });
-      loadConfig().catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
+      loadConfig().then((config) => { configState = config; }).catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
     </script>
   </body>
 </html>

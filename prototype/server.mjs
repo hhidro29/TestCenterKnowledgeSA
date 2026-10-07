@@ -31,7 +31,11 @@ const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30
 const PROFILE_LABELS = { all: "Semua knowledge base" };
 const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
 const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
-const MODELS = [ACTIVE_MODEL];
+const MODEL_OPTIONS = [
+  { id: GROQ_MODEL, label: `Qwen · ${GROQ_MODEL}`, provider: "groq", apiKey: GROQ_API_KEY },
+  { id: GEMINI_MODEL, label: `Gemini · ${GEMINI_MODEL}`, provider: "gemini", apiKey: GEMINI_API_KEY },
+].filter((model, index, all) => all.findIndex((item) => item.id === model.id) === index);
+const MODELS = MODEL_OPTIONS.map((model) => model.id);
 
 let systemPrompt = "";
 let localDocs = [];
@@ -235,8 +239,8 @@ function buildInstructions() {
   return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
 }
 
-async function callGemini({ message, history = [] }) {
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY belum dikonfigurasi.");
+async function callGemini({ message, history = [], model = GEMINI_MODEL, apiKey = GEMINI_API_KEY }) {
+  if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi.");
   const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
   const contents = [
     ...history.slice(-10).map((item) => ({
@@ -245,7 +249,7 @@ async function callGemini({ message, history = [] }) {
     })),
     { role: "user", parts: [{ text: buildPrompt(message, retrieved.context) }] },
   ];
-  const endpoint = `${GEMINI_BASE_URL}/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const endpoint = `${GEMINI_BASE_URL}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -265,11 +269,11 @@ async function callGemini({ message, history = [] }) {
     .join("\n")
     .trim();
   if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
-  return { mode: "gemini", model: GEMINI_MODEL, answer, sources: retrieved.sources };
+  return { mode: "gemini", model, answer, sources: retrieved.sources };
 }
 
-async function callGroq({ message, history = [] }) {
-  if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY belum dikonfigurasi.");
+async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GROQ_API_KEY }) {
+  if (!apiKey) throw new Error("GROQ_API_KEY belum dikonfigurasi.");
   const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
   const messages = [
     { role: "system", content: buildInstructions() },
@@ -281,8 +285,8 @@ async function callGroq({ message, history = [] }) {
   ];
   const response = await fetch(GROQ_BASE_URL, {
     method: "POST",
-    headers: { authorization: `Bearer ${GROQ_API_KEY}`, "content-type": "application/json" },
-    body: JSON.stringify({ model: GROQ_MODEL, messages, temperature: 0.2, max_tokens: 700 }),
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: 700 }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -291,7 +295,11 @@ async function callGroq({ message, history = [] }) {
   }
   const answer = data.choices?.[0]?.message?.content?.trim();
   if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
-  return { mode: "groq", model: GROQ_MODEL, answer, sources: retrieved.sources };
+  return { mode: "groq", model, answer, sources: retrieved.sources };
+}
+
+function resolveModel(requestedModel) {
+  return MODEL_OPTIONS.find((model) => model.id === requestedModel) || MODEL_OPTIONS.find((model) => model.id === ACTIVE_MODEL) || MODEL_OPTIONS[0];
 }
 
 function isRateLimited(req) {
@@ -316,7 +324,7 @@ async function handle(req, res) {
       provider: AI_PROVIDER,
       hasApiKey: Boolean(ACTIVE_API_KEY),
       defaultModel: ACTIVE_MODEL,
-      models: MODELS,
+      models: MODEL_OPTIONS.map(({ id, label, provider, apiKey }) => ({ id, label, provider, available: Boolean(apiKey) })),
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
       mode: ACTIVE_API_KEY ? AI_PROVIDER : "demo-local",
@@ -329,31 +337,40 @@ async function handle(req, res) {
       const message = String(body.message || "").trim().slice(0, MAX_MESSAGE_LENGTH);
       if (!message) return json(res, 400, { error: "Pertanyaan masih kosong." });
       const history = Array.isArray(body.history) ? body.history : [];
-      if (ACTIVE_API_KEY && AI_PROVIDER === "gemini") {
+      const selected = resolveModel(String(body.model || ACTIVE_MODEL));
+      if (selected.apiKey && selected.provider === "gemini") {
         try {
-          return json(res, 200, await callGemini({ message, history }));
+          return json(res, 200, await callGemini({ message, history, model: selected.id, apiKey: selected.apiKey }));
         } catch (error) {
+          console.error(`[${selected.provider}/${selected.id}]`, error.message);
           const fallback = localSearch(message);
           return json(res, 200, {
             ...fallback,
+            model: selected.id,
             mode: "demo-local-fallback",
             warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
           });
         }
       }
-      if (ACTIVE_API_KEY && AI_PROVIDER === "groq") {
+      if (selected.apiKey && selected.provider === "groq") {
         try {
-          return json(res, 200, await callGroq({ message, history }));
+          return json(res, 200, await callGroq({ message, history, model: selected.id, apiKey: selected.apiKey }));
         } catch (error) {
+          console.error(`[${selected.provider}/${selected.id}]`, error.message);
           const fallback = localSearch(message);
           return json(res, 200, {
             ...fallback,
+            model: selected.id,
             mode: "demo-local-fallback",
             warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
           });
         }
       }
-      return json(res, 200, localSearch(message));
+      return json(res, 200, {
+        ...localSearch(message),
+        model: selected.id,
+        warning: `${selected.label} belum dikonfigurasi. Tambahkan API key provider tersebut untuk mengaktifkannya.`,
+      });
     } catch (error) {
       return json(res, 500, { error: error.message || "Gagal memproses pertanyaan." });
     }
