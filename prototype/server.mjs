@@ -64,8 +64,43 @@ function normalize(value) {
     .replace(/[^a-z0-9\s]/g, " ");
 }
 
+const STOPWORDS = new Set([
+  "ada", "agar", "akan", "aku", "apa", "atau", "bagi", "bahwa", "berapa", "bisa", "dan", "dari", "dengan",
+  "di", "dalam", "ini", "jadi", "juga", "ke", "kamu", "karena", "mana", "mau", "menurut", "oleh", "pada",
+  "saja", "saya", "sebagai", "sebutkan", "sistem", "tentang", "terkait", "tidak", "untuk", "yang", "nya",
+]);
+
+function queryTerms(query) {
+  return [...new Set(normalize(query).split(/\s+/).filter((term) => term.length > 2 && !STOPWORDS.has(term)))];
+}
+
+function cleanExcerpt(value) {
+  return String(value || "")
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/<https?:\/\/[^>]+>/g, "")
+    .replace(/[*_`>#]/g, "")
+    .replace(/^\s*[-+•]\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function relevantExcerpts(doc, terms) {
+  const body = doc.content.replace(/^---[\s\S]*?---\s*/, "");
+  const lines = body
+    .split(/\r?\n/)
+    .map(cleanExcerpt)
+    .filter((line) => line && !/^\|?\s*[-:|]+\s*\|?$/.test(line) && !/^sumber:/i.test(line));
+  const matching = lines.filter((line) => {
+    const normalized = normalize(line);
+    return terms.some((term) => new RegExp(`\\b${term}\\b`, "i").test(normalized));
+  });
+  const fallback = lines.filter((line) => line.length > 35 && !line.startsWith("http"));
+  return [...new Set([...matching, ...fallback])].slice(0, 2);
+}
+
 function localSearch(query, profile) {
-  const terms = [...new Set(normalize(query).split(/\s+/).filter((term) => term.length > 2))];
+  const terms = queryTerms(query);
   const candidates = localDocs
     .filter((doc) => profile === "all" || doc.relative.startsWith(`${profile}/`))
     .map((doc) => {
@@ -73,8 +108,8 @@ function localSearch(query, profile) {
       const body = normalize(doc.content);
       let score = 0;
       for (const term of terms) {
-        if (title.includes(term)) score += 7;
-        score += Math.min((body.match(new RegExp(term, "g")) || []).length, 8);
+        if (new RegExp(`\\b${term}\\b`, "i").test(title)) score += 10;
+        score += Math.min((body.match(new RegExp(`\\b${term}\\b`, "g")) || []).length, 8);
       }
       return { ...doc, score };
     })
@@ -85,8 +120,7 @@ function localSearch(query, profile) {
   if (!candidates.length) {
     return {
       mode: "demo-local",
-      answer:
-        "Mode demo lokal aktif. Aku belum menemukan dokumen yang cukup relevan untuk pertanyaan ini. Hubungkan OPENAI_API_KEY dan OPENAI_VECTOR_STORE_ID untuk jawaban model AI dengan File Search.",
+      answer: "Aku belum menemukan bagian knowledge base yang cukup relevan untuk pertanyaan ini. Coba tambahkan nama topik, program, atau tahun yang lebih spesifik.",
       sources: [],
     };
   }
@@ -97,9 +131,18 @@ function localSearch(query, profile) {
     status: doc.metadata.source_status || "verified_extracted",
     url: doc.metadata.source_url || "",
   }));
+  const excerpts = candidates
+    .map((doc) => ({ title: doc.title, lines: relevantExcerpts(doc, terms) }))
+    .filter((item) => item.lines.length);
+  const answer = excerpts.length
+    ? [
+        "Berikut ringkasan yang ditemukan di knowledge base:",
+        ...excerpts.map((item) => `\n${item.title}\n${item.lines.map((line) => `• ${line}`).join("\n")}`),
+      ].join("\n")
+    : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
   return {
     mode: "demo-local",
-    answer: `Aku menemukan ${candidates.length} sumber yang relevan untuk pertanyaanmu. Saat ini prototype sedang memakai mode demo lokal, jadi aku belum merangkai jawaban percakapan dari isi dokumen. Sumber relevan ditampilkan di bawah.`,
+    answer,
     sources,
   };
 }
