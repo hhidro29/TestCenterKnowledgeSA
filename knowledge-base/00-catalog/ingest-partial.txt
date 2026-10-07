@@ -1,0 +1,17 @@
+# Optional supplemental package; do not treat as default facts.
+
+90-appendices/01-a-ketentuan-fisik-dan-medis-per-sekolah-kedinasan.md
+90-appendices/02-b-alur-umum-seleksi-sekolah-kedinasan.md
+90-appendices/03-1-catatan-seputar-kedinasan.md
+90-appendices/04-2-data-jalur-mandiri-2026.md
+90-appendices/05-3-statistik-nilai-utbk-snbt.md
+90-appendices/06-4-panduan-ketentuan-sertifikat-di-snbp.md
+90-appendices/07-5-tanya-jawab-seputar-tka-versi-2.md
+90-appendices/08-6-kebijakan-tes-kemampuan-akademik-tka.md
+90-appendices/09-7-juknis-spcp-ipdn-2026.md
+90-appendices/10-8-bac-handbook-12-sma-dan-utbk.md
+90-appendices/11-9-fasilitas-brain-academy-center-ay-26-27.md
+90-appendices/12-10-panduan-akses-tes-minat-bakat-penjurusan-kuliah.md
+90-appendices/13-11-panduan-akses-tryout-utbk-onsite.md
+90-appendices/14-12-buku-panduan-brain-academy-online.md
+90-appendices/15-sumber-yang-masih-gagal-setelah-percobaan-ulang.md

@@ -1,0 +1,853 @@
+{
+  "knowledge_base": "linktree-brain-academy",
+  "version": "1.0",
+  "extraction_date": "2026-10-06",
+  "source_file": "Ekstraksi Knowledge Semua Linktree - Rapi.md",
+  "profiles": [
+    {
+      "profile": "Kejarkedinasan",
+      "profile_id": "01-kejarkedinasan",
+      "topic": "kedinasan",
+      "profile_url": "https://linktr.ee/kejarkedinasan",
+      "source_count": 25
+    },
+    {
+      "profile": "Pejuang Kampus Impian",
+      "profile_id": "02-pejuang-kampus-impian",
+      "topic": "kampus",
+      "profile_url": "https://linktr.ee/pejuangkampusimpian",
+      "source_count": 21
+    },
+    {
+      "profile": "Pendekar TKA",
+      "profile_id": "03-pendekar-tka",
+      "topic": "tka",
+      "profile_url": "https://linktr.ee/pendekartka",
+      "source_count": 11
+    },
+    {
+      "profile": "BAC 12 SMA",
+      "profile_id": "04-bac-12-sma",
+      "topic": "brain-academy-center",
+      "profile_url": "https://linktr.ee/BAC_12SMA",
+      "source_count": 24
+    },
+    {
+      "profile": "Math Champs",
+      "profile_id": "05-math-champs",
+      "topic": "math-champs",
+      "profile_url": "https://linktr.ee/usermathchamps",
+      "source_count": 8
+    },
+    {
+      "profile": "Brain Academy Online",
+      "profile_id": "06-brain-academy-online",
+      "topic": "brain-academy-online",
+      "profile_url": "https://linktr.ee/usersbao",
+      "source_count": 11
+    }
+  ],
+  "documents": [
+    {
+      "path": "01-kejarkedinasan/01-facts/01-nilai-ambang-batas-skd-seleksi-sekdin-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Nilai Ambang Batas SKD Seleksi Sekdin 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1FfCleEjYDP8CiSWgJho-6YgBLTbmfeeP/view?usp=drive_link",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/02-permenpan-rb-nomor-13-tahun-2026-tentang-penerimaan-peserta-didik-sekolah-kedinasan.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Permenpan RB Nomor 13 Tahun 2026 tentang Penerimaan Peserta Didik Sekolah Kedinasan",
+      "source_status": "verified_extracted",
+      "source_url": "https://jdih.menpan.go.id/dokumen-hukum/peraturan-menteri-pendayagunaan-aparatur-negara-dan-reformasi-birokrasi-nomor-13-tahun-2026-tentang-2117",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/03-formasi-sekolah-kedinasan-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Formasi Sekolah Kedinasan 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://www.menpan.go.id/site/berita-terkini/pemerintah-siapkan-4-770-kebutuhan-cpns-sekolah-kedinasan-2026",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/04-jadwal-penerimaan-peserta-didik-sekolah-kedinasan-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Jadwal Penerimaan Peserta Didik Sekolah Kedinasan 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1V7pMN52Hwn98iiiGtdgctSX8XycdqOfx/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/05-sscasn-pendaftaran-sekolah-kedinasan-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "SSCASN - Pendaftaran Sekolah Kedinasan 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://sscasn.bkn.go.id/",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/06-buku-panduan-pendaftaran-akun-sscasn-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Buku Panduan - Pendaftaran Akun SSCASN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1ADL87aHE2f-oLjwhrGfQdhQvtrTwjWlH/view?usp=drive_link",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/07-tata-cara-pembayaran-seleksi-sekolah-kedinasan-sscasn-bkn.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Tata Cara Pembayaran Seleksi Sekolah Kedinasan - SSCASN BKN",
+      "source_status": "verified_extracted",
+      "source_url": "https://sscasn.bkn.go.id/tata-cara-pembayaran",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/08-stan-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "STAN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1VLxbuMVohAbuUXv8yasYMfDz2-ERG0fo/view?usp=drive_link",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/09-template-surat-pernyataan-stan-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "[Template] Surat Pernyataan STAN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://docs.google.com/document/d/1uMlkaojJz-Nmul3sygE1vvs0VnoulGVb/edit?usp=drive_link&ouid=107529673665976905136&rtpof=true&sd=true",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/10-contoh-surat-pernyataan-stan-2026-yang-sudah-terisi.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Contoh Surat Pernyataan STAN 2026 yang Sudah Terisi",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1o3cLgzDOr1LONaqCXBHXjjcKt8r6OfRE/view?usp=drive_link",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/11-stis-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "STIS 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1gep4uocrbolorG62Dpk6sKkmRGyvHXQc/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/12-stmkg-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "STMKG 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1qa0wksPonIiwHAYOU57DDkS4-YbSnCHM/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/13-formasi-kemenhub-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "[Formasi] Kemenhub 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1ct95H9Jh_Aq0pVDX-DdSK9trwhFDlDVr/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/14-ringkasan-info-kemenhub-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "[Ringkasan Info] Kemenhub 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1nOdi__5wkG6g6S_0_ig9z02FBjUbTRfs/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/15-jadwal-ipdn-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "[Jadwal] IPDN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1p2l1IGpKzJXuqUYhDRtTMZkaVC1ZogAb/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/16-pakta-integritas-spcp-ipdn-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Pakta Integritas SPCP IPDN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1qVcX55aIJdLMkVjaSDK4nLPFFQdgCOok/view?usp=drive_link",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/17-format-surat-keterangan-oap.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Format Surat Keterangan OAP",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1OgnMaLcyq_WbHQTaeoVDBc_omvApn3Z-/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/18-poltekpin-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Poltekpin 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1aXcxTAMkSWjkgr0pA9ot_g7B_gL1dAAA/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/19-poltek-imipas-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Poltek Imipas 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/14r4KEtHcWQPkPoV2XGbFcc8K7ZW8wwI4/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/20-stin-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "STIN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1GgZmQAj47WY8JasotwYOV_UsXsvEeFeQ/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/01-facts/21-poltek-ssn-2026.md",
+      "doc_type": "source_document",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Poltek SSN 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1snBrMacXqd7ZHzdUjNyu5pRGXCiBClFS/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "01-kejarkedinasan/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/01-panduan-pendaftaran-snbt-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Panduan Pendaftaran SNBT 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://files.snpmb.id/web2026/Panduan%20Pendaftaran%20UTBK%20SNBT%202026.pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/02-kota-utbk-pilihan-peserta-snbt-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Kota UTBK Pilihan Peserta SNBT 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://snpmb.id/utbk-snbt/kota-utbk-pilihan-peserta",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/03-ketentuan-snbt-2025.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Ketentuan SNBT 2025",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1Zd03J78KRU7P5DVNlT-KvcxwVMXNSHkL/view",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/04-daya-tampung-snbp-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Daya Tampung SNBP 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://sidatagrun-public-1076756628210.asia-southeast2.run.app/ptn_sn.php",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/05-daya-tampung-snbt-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Daya Tampung SNBT 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://sidatagrun-public-1076756628210.asia-southeast2.run.app/ptn_sb.php",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/06-informasi-snpmb-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Informasi SNPMB 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://files.snpmb.id/web2026/Paparan%20Informasi%20SNPMB%202026%20untuk%20Peluncuran.pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/07-panduan-registrasi-akun-snpmb-siswa.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Panduan Registrasi Akun SNPMB Siswa",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1NIf68YaWfau6PsAK0ahaTmHA7Xex1bD4/view",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/08-panduan-verifikasi-akun-snpmb-siswa.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Panduan Verifikasi Akun SNPMB Siswa",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1RdNGvtQPTpSUC_Gi29zs9grgcsaz7wYn/view",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/09-laman-resmi-snpmb-bp3.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Laman Resmi SNPMB BP3",
+      "source_status": "verified_extracted",
+      "source_url": "https://snpmb.id/",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/10-panduan-umum-portofolio-seni-dan-olahraga-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Panduan Umum Portofolio Seni dan Olahraga 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://files.snpmb.id/panduan-2026/PANDUAN%20UMUM%20PORTO%202026%20(09012026).pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/11-panduan-pendaftaran-snbp-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Panduan Pendaftaran SNBP 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://files.snpmb.id/web2026/Panduan%20Pendaftaran%20SNBP%202026.pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/12-sosialisasi-pdss-2026.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Sosialisasi PDSS 2026",
+      "source_status": "verified_extracted",
+      "source_url": "https://files.snpmb.id/web2026/Sosialisasi%20PDSS%202026.pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/13-ketentuan-snbp-2025.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Ketentuan SNBP 2025",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1BuQZOX2RPmwI2AqCuQ4i4v_6hUICvVVN/view",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/01-facts/14-rasionalisasi-snbp-ruangguru.md",
+      "doc_type": "source_document",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Rasionalisasi SNBP Ruangguru",
+      "source_status": "verified_extracted",
+      "source_url": "https://www.ruangguru.com/rasionalisasi",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/01-tka-pusat-assesment-pendidikan-kementerian-pendidikan-dasar-dan-menengah.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "TKA - Pusat Assesment Pendidikan :: Kementerian Pendidikan Dasar dan Menengah",
+      "source_status": "verified_extracted",
+      "source_url": "https://pusmendik.kemendikdasmen.go.id/tka/tka/view/mata-pelajaran-wajib/sma",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/02-1274-kepmendikdasmen-nomor-102-m-2025-mata-pelajaran-pendukung-program-studi-dalam-snbp-pd.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "1274_Kepmendikdasmen Nomor 102_M_2025_Mata Pelajaran Pendukung Program Studi dalam SNBP.pdf",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/14ol0gCkEtnDVG4I65ff-JkWz4P9Qjuih/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/03-1329-perka-bskap-45-h-an-2025-tentang-kerangka-asesmen-tes-kemampuan-akademik-jenjang-sma-.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "1329_Perka BSKAP 45-H-AN-2025 tentang Kerangka Asesmen Tes Kemampuan Akademik Jenjang SMA, MA sederajat dan SMK, MAK.pdf",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1H_eeQB405z384VV-LojQrS1p6nGo6_M4/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/04-ayo-coba-tka-pilih-mata-pelajaran.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "Ayo Coba TKA | Pilih Mata Pelajaran",
+      "source_status": "verified_extracted",
+      "source_url": "https://pusmendik.kemendikdasmen.go.id/tka/simulasi_tka",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/05-materi-webinar-ayo-coba-tka-smp.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "Materi Webinar - Ayo Coba TKA SMP",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1S1_60scVB-pJCXoe2Jn9mbrrCHNpf05W/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/06-6023-salinan-perkaban-nomor-47-tahun-2025-tentang-kerangka-asesmen-tka-sd-mi-dan-smp-mts-p.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "6023_Salinan Perkaban Nomor 47 Tahun 2025 tentang Kerangka Asesmen TKA_SD_MI dan SMP_MTs.pdf",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1D3cGbI2qN4QBdZ4WDTedjFtn_33sPoAn/view?usp=drivesdk",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/01-facts/07-tanya-jawab-seputar-tka.md",
+      "doc_type": "source_document",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "Tanya Jawab Seputar TKA",
+      "source_status": "verified_extracted",
+      "source_url": "https://repositori.kemendikdasmen.go.id/33126/1/Tanya%20Jawab%20TKA.pdf",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "04-bac-12-sma/01-facts/01-panduan-akses-izin-tidak-hadir-sesi.md",
+      "doc_type": "source_document",
+      "profile": "BAC 12 SMA",
+      "topic": "brain-academy-center",
+      "title": "📭Panduan Akses - Izin Tidak Hadir Sesi",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1jiyxjP4X1lzgwDe5e_olkWAlLipzlsV8/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "04-bac-12-sma/01-facts/02-informasi-seleksi-masuk-perguruan-tinggi.md",
+      "doc_type": "source_document",
+      "profile": "BAC 12 SMA",
+      "topic": "brain-academy-center",
+      "title": "📖 Informasi Seleksi Masuk Perguruan Tinggi",
+      "source_status": "verified_extracted",
+      "source_url": "https://linktr.ee/pejuangkampusimpian",
+      "retrieval_default": true
+    },
+    {
+      "path": "04-bac-12-sma/01-facts/03-informasi-tes-kemampuan-akademik-tka.md",
+      "doc_type": "source_document",
+      "profile": "BAC 12 SMA",
+      "topic": "brain-academy-center",
+      "title": "📖 Informasi Tes Kemampuan Akademik (TKA)",
+      "source_status": "verified_extracted",
+      "source_url": "https://linktr.ee/pendekartka",
+      "retrieval_default": true
+    },
+    {
+      "path": "04-bac-12-sma/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "BAC 12 SMA",
+      "topic": "brain-academy-center",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "05-math-champs/01-facts/01-guideline-math-champs-online-singapore-math.md",
+      "doc_type": "source_document",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "Guideline Math Champs Online - Singapore Math",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1FU6kLYF8pMUvM5mps5rABdsg0KixoWFV/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "05-math-champs/01-facts/02-guideline-math-champs-online-sempoa.md",
+      "doc_type": "source_document",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "Guideline Math Champs Online - Sempoa",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1j0_F0DTyhMQrMUv5cmjTWAn-LIhLYCc-/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "05-math-champs/01-facts/03-guideline-math-champs-offline-singapore-math.md",
+      "doc_type": "source_document",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "Guideline Math Champs Offline - Singapore Math",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1_dI0I-Np2h5Okdz1I2CV24ZAl8DEAm5p/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "05-math-champs/01-facts/04-guideline-math-champs-offline-sempoa.md",
+      "doc_type": "source_document",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "Guideline Math Champs Offline - Sempoa",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/1DmNf-Kd12QmQid5-sYI3BXCZDE6tsOMA/view?usp=sharing",
+      "retrieval_default": true
+    },
+    {
+      "path": "05-math-champs/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "06-brain-academy-online/01-facts/01-jadwal-belajar-brain-academy-online-ta-2026-2027.md",
+      "doc_type": "source_document",
+      "profile": "Brain Academy Online",
+      "topic": "brain-academy-online",
+      "title": "Jadwal Belajar Brain Academy Online TA. 2026/2027",
+      "source_status": "verified_extracted",
+      "source_url": "https://drive.google.com/file/d/13INCS0C-kAWf-u9mkQusxu6bsXmLkvh3/view?usp=sharing&utm_medium=student+advisor&utm_source=whatsapp&utm_campaign=jadwal+belajar+brain+academy+online+ta.+2026%2F2027",
+      "retrieval_default": true
+    },
+    {
+      "path": "06-brain-academy-online/03-unverified-links.md",
+      "doc_type": "source_register_metadata",
+      "profile": "Brain Academy Online",
+      "topic": "brain-academy-online",
+      "title": "Sumber yang belum tervalidasi",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "00-catalog/cross-profile-summary.md",
+      "doc_type": "cross_profile_summary",
+      "profile": "all",
+      "topic": "cross-profile",
+      "title": "Ringkasan tematik lintas profil",
+      "source_status": "verified_extracted",
+      "source_url": "",
+      "retrieval_default": true
+    },
+    {
+      "path": "90-appendices/01-a-ketentuan-fisik-dan-medis-per-sekolah-kedinasan.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "A. Ketentuan fisik dan medis per sekolah kedinasan",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/02-b-alur-umum-seleksi-sekolah-kedinasan.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "B. Alur umum seleksi sekolah kedinasan",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/03-1-catatan-seputar-kedinasan.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "1. Catatan Seputar Kedinasan",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/04-2-data-jalur-mandiri-2026.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "2. Data Jalur Mandiri 2026",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/05-3-statistik-nilai-utbk-snbt.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "3. Statistik Nilai UTBK — SNBT",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/06-4-panduan-ketentuan-sertifikat-di-snbp.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "4. Panduan Ketentuan Sertifikat di SNBP",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/07-5-tanya-jawab-seputar-tka-versi-2.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "5. Tanya Jawab Seputar TKA Versi 2",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/08-6-kebijakan-tes-kemampuan-akademik-tka.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "6. Kebijakan Tes Kemampuan Akademik (TKA)",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/09-7-juknis-spcp-ipdn-2026.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "7. Juknis SPCP IPDN 2026",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/10-8-bac-handbook-12-sma-dan-utbk.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "8. BAC Handbook 12 SMA dan UTBK",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/11-9-fasilitas-brain-academy-center-ay-26-27.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "9. Fasilitas Brain Academy Center AY 26/27",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/12-10-panduan-akses-tes-minat-bakat-penjurusan-kuliah.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "10. Panduan Akses Tes Minat Bakat — Penjurusan Kuliah",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/13-11-panduan-akses-tryout-utbk-onsite.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "11. Panduan Akses Tryout UTBK Onsite",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/14-12-buku-panduan-brain-academy-online.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "12. Buku Panduan Brain Academy Online",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "90-appendices/15-sumber-yang-masih-gagal-setelah-percobaan-ulang.md",
+      "doc_type": "supplemental_appendix",
+      "profile": "all",
+      "topic": "appendix",
+      "title": "Sumber yang masih gagal setelah percobaan ulang",
+      "source_status": "supplemental_screenshot_or_browser",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "00-catalog/overview.md",
+      "doc_type": "catalog_overview",
+      "profile": "all",
+      "topic": "all",
+      "title": "Overview",
+      "source_status": "metadata_and_summary",
+      "source_url": "",
+      "retrieval_default": true
+    },
+    {
+      "path": "00-catalog/source-register.csv",
+      "doc_type": "source_register_metadata",
+      "profile": "all",
+      "topic": "all",
+      "title": "Source register",
+      "source_status": "metadata_only",
+      "source_url": "",
+      "retrieval_default": false
+    },
+    {
+      "path": "01-kejarkedinasan/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "Kejarkedinasan",
+      "topic": "kedinasan",
+      "title": "01-kejarkedinasan",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/kejarkedinasan",
+      "retrieval_default": true
+    },
+    {
+      "path": "02-pejuang-kampus-impian/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "Pejuang Kampus Impian",
+      "topic": "kampus",
+      "title": "02-pejuang-kampus-impian",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/pejuangkampusimpian",
+      "retrieval_default": true
+    },
+    {
+      "path": "03-pendekar-tka/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "Pendekar TKA",
+      "topic": "tka",
+      "title": "03-pendekar-tka",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/pendekartka",
+      "retrieval_default": true
+    },
+    {
+      "path": "04-bac-12-sma/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "BAC 12 SMA",
+      "topic": "brain-academy-center",
+      "title": "04-bac-12-sma",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/BAC_12SMA",
+      "retrieval_default": true
+    },
+    {
+      "path": "05-math-champs/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "Math Champs",
+      "topic": "math-champs",
+      "title": "05-math-champs",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/usermathchamps",
+      "retrieval_default": true
+    },
+    {
+      "path": "06-brain-academy-online/00-profile.md",
+      "doc_type": "profile_overview",
+      "profile": "Brain Academy Online",
+      "topic": "brain-academy-online",
+      "title": "06-brain-academy-online",
+      "source_status": "profile_metadata",
+      "source_url": "https://linktr.ee/usersbao",
+      "retrieval_default": true
+    }
+  ],
+  "ingestion_rule": "Index retrieval_default=true by default; include partial documents only with explicit status-aware prompting."
+}

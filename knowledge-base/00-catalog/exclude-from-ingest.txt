@@ -1,0 +1,13 @@
+# Metadata and governance; do not upload as evidence.
+
+01-kejarkedinasan/03-unverified-links.md
+02-pejuang-kampus-impian/03-unverified-links.md
+03-pendekar-tka/03-unverified-links.md
+04-bac-12-sma/03-unverified-links.md
+05-math-champs/03-unverified-links.md
+06-brain-academy-online/03-unverified-links.md
+00-catalog/source-register.csv
+00-catalog/manifest.json
+00-governance/README.md
+00-governance/UPDATE-GUIDE.md
+99-archive/README.md

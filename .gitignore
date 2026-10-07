@@ -1,0 +1,18 @@
+# Local build and generated media artifacts
+.codex-build/
+outputs/
+*.wav
+*.m4a
+*.mp3
+*.pptx
+
+# Runtime and local secrets
+.env
+.env.*
+!.env.example
+node_modules/
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/

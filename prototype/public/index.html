@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brain Academy Assistant</title>
+    <style>
+      :root { --ink:#1f2937; --muted:#778196; --line:#e5e9f0; --blue:#2f6fed; --blue-dark:#1e55bf; --chat:#edf3f8; --white:#fff; }
+      * { box-sizing:border-box; }
+      html, body { height:100%; }
+      body { margin:0; color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#dbe5ee; }
+      button, select, textarea { font:inherit; }
+      .app { width:min(1080px, 100%); height:min(820px, 100vh); min-height:650px; margin:20px auto; overflow:hidden; background:var(--white); box-shadow:0 20px 60px rgba(31,47,70,.2); display:flex; flex-direction:column; }
+      .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:12px 20px; border-bottom:1px solid var(--line); background:var(--white); }
+      .identity { display:flex; align-items:center; gap:12px; min-width:0; }
+      .avatar { width:46px; height:46px; display:grid; place-items:center; flex:0 0 auto; color:#fff; font-weight:900; letter-spacing:-.06em; border-radius:50%; background:linear-gradient(140deg,#3a7cf3,#7a6ff1); box-shadow:0 6px 14px rgba(47,111,237,.23); }
+      .name { margin:0; font-size:16px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .presence { margin-top:3px; color:var(--muted); font-size:12px; display:flex; align-items:center; gap:6px; }
+      .presence-dot { width:7px; height:7px; border-radius:50%; background:#efad42; }
+      .presence-dot.ready { background:#1ca36e; }
+      .controls { display:flex; align-items:center; gap:10px; }
+      .model-wrap { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; font-weight:800; }
+      .model-wrap select { max-width:145px; padding:8px 28px 8px 10px; border:1px solid var(--line); border-radius:9px; color:var(--ink); background:#f8fafc; outline:none; }
+      .more { width:34px; height:34px; border:0; color:var(--muted); background:transparent; border-radius:50%; font-size:22px; cursor:pointer; }
+      .more:hover { background:#f2f5f9; }
+      .compare-toggle { padding:8px 11px; border:1px solid #d8e2f0; border-radius:9px; color:#3767c5; background:#f8fbff; font-size:11px; font-weight:800; cursor:pointer; }
+      .compare-toggle:hover, .compare-toggle.active { border-color:#9fbbf1; color:#fff; background:var(--blue); }
+      .conversation { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--chat); }
+      .messages { flex:1; overflow-y:auto; padding:26px clamp(14px, 5vw, 70px) 16px; display:flex; flex-direction:column; gap:8px; background-color:#edf3f8; background-image:radial-gradient(rgba(103,125,149,.12) .8px, transparent .8px); background-size:18px 18px; }
+      .compare-view { flex:1; min-height:0; overflow:auto; padding:20px clamp(10px, 3vw, 32px); display:grid; grid-template-columns:repeat(3, minmax(230px, 1fr)); gap:12px; background-color:#edf3f8; background-image:radial-gradient(rgba(103,125,149,.12) .8px, transparent .8px); background-size:18px 18px; }
+      .model-pane { min-width:0; display:flex; flex-direction:column; overflow:hidden; border:1px solid #dce4ed; border-radius:15px; background:rgba(255,255,255,.78); box-shadow:0 4px 14px rgba(45,63,86,.06); }
+      .model-pane-head { padding:12px 13px; border-bottom:1px solid #e4eaf1; background:#fff; }
+      .model-pane-title { color:#263a58; font-size:13px; font-weight:850; }
+      .model-pane-status { margin-top:3px; color:#8a95a5; font-size:10px; }
+      .model-pane-body { flex:1; min-height:150px; overflow:auto; padding:13px; }
+      .compare-question { margin-bottom:10px; padding:8px 10px; color:#24462e; background:#d9fdd3; border-radius:11px 11px 3px 11px; font-size:12px; line-height:1.4; }
+      .compare-answer { padding:10px 11px; color:var(--ink); background:#fff; border-radius:3px 11px 11px 11px; font-size:12px; line-height:1.5; white-space:pre-wrap; }
+      .compare-sources { display:flex; flex-direction:column; gap:5px; margin-top:9px; }
+      .compare-source { padding:7px 8px; border:1px solid #e0e6ee; border-radius:8px; color:#778397; background:#f9fbfd; font-size:10px; }
+      .compare-source strong { display:block; overflow:hidden; color:#36445a; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+      .compare-history { display:flex; flex-direction:column; gap:7px; }
+      .compare-bubble { padding:8px 9px; border-radius:10px; font-size:11px; line-height:1.45; white-space:pre-wrap; }
+      .compare-bubble.user { align-self:flex-end; max-width:94%; color:#24462e; background:#d9fdd3; border-radius:10px 10px 3px 10px; }
+      .compare-bubble.assistant { align-self:flex-start; max-width:100%; color:var(--ink); background:#fff; border-radius:3px 10px 10px 10px; }
+      .compare-empty { grid-column:1 / -1; align-self:center; justify-self:center; max-width:470px; padding:25px; text-align:center; color:var(--muted); background:rgba(255,255,255,.88); border:1px solid #dfe6ee; border-radius:16px; font-size:13px; line-height:1.5; }
+      .welcome { align-self:center; max-width:430px; margin:auto; padding:24px 22px; text-align:center; background:rgba(255,255,255,.9); border:1px solid rgba(220,228,237,.85); border-radius:18px; box-shadow:0 8px 24px rgba(45,63,86,.06); }
+      .welcome-icon { width:42px; height:42px; margin:0 auto 11px; display:grid; place-items:center; border-radius:14px; color:var(--blue); background:#e8efff; font-size:20px; }
+      .welcome h1 { margin:0 0 8px; color:var(--ink); font-size:21px; letter-spacing:-.03em; }
+      .welcome p { margin:0; color:var(--muted); line-height:1.5; font-size:13px; }
+      .suggestions { display:flex; flex-wrap:wrap; justify-content:center; gap:7px; margin-top:17px; }
+      .suggestion { border:1px solid #d7e1f3; color:#2c5fc0; background:#f8fbff; border-radius:999px; padding:8px 11px; font-size:11px; cursor:pointer; }
+      .suggestion:hover { border-color:#aac4f8; background:#fff; }
+      .msg-row { display:flex; flex-direction:column; max-width:78%; }
+      .msg-row.user { align-self:flex-end; align-items:flex-end; }
+      .msg-row.assistant { align-self:flex-start; align-items:flex-start; }
+      .msg { padding:10px 13px 8px; color:var(--ink); line-height:1.5; font-size:14px; white-space:pre-wrap; box-shadow:0 1px 1px rgba(35,50,70,.06); }
+      .msg-row.user .msg { color:#143e2d; background:#d9fdd3; border-radius:15px 15px 4px 15px; }
+      .msg-row.assistant .msg { background:#fff; border-radius:15px 15px 15px 4px; }
+      .msg-meta { display:flex; align-items:center; gap:7px; margin:3px 4px 0; color:#8994a5; font-size:10px; }
+      .msg-row.user .msg-meta { justify-content:flex-end; }
+      .tick { color:#3e80e8; font-size:12px; }
+      .sources { align-self:flex-start; display:flex; flex-wrap:wrap; gap:6px; margin:3px 0 6px 8px; max-width:calc(100% - 8px); }
+      .source { display:inline-flex; flex-direction:column; gap:3px; max-width:265px; padding:8px 10px; border:1px solid #dbe3ec; border-radius:10px; color:#748095; background:rgba(255,255,255,.9); font-size:10px; }
+      .source strong { overflow:hidden; color:#334155; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+      .composer-zone { padding:11px clamp(12px, 4vw, 58px) 13px; border-top:1px solid rgba(212,222,232,.8); background:#f7f9fb; }
+      .composer { display:flex; align-items:flex-end; gap:9px; max-width:890px; margin:0 auto; }
+      .icon-button { width:40px; height:40px; flex:0 0 auto; border:0; border-radius:50%; color:#8190a4; background:transparent; font-size:19px; cursor:pointer; }
+      .icon-button:hover { background:#eaf0f6; }
+      textarea { flex:1; min-height:42px; max-height:126px; resize:none; padding:11px 14px; border:1px solid #d9e1eb; border-radius:21px; outline:none; color:var(--ink); background:#fff; line-height:1.35; }
+      textarea:focus { border-color:#9dbcf4; box-shadow:0 0 0 3px rgba(47,111,237,.1); }
+      .send { width:42px; height:42px; flex:0 0 auto; border:0; border-radius:50%; color:#fff; background:var(--blue); font-size:18px; cursor:pointer; box-shadow:0 5px 12px rgba(47,111,237,.24); }
+      .send:hover { background:var(--blue-dark); }
+      .send:disabled { opacity:.55; cursor:wait; }
+      .note { max-width:890px; margin:7px auto 0; color:#9aa5b4; text-align:right; font-size:10px; }
+      @media (max-width:850px) { .compare-view { grid-template-columns:repeat(3, minmax(0, 1fr)); overflow-x:hidden; padding-left:10px; padding-right:10px; } .model-pane { min-height:260px; } }
+      @media (max-width:580px) { .compare-view { grid-template-columns:repeat(3, minmax(220px, 1fr)); overflow-x:auto; } }
+      @media (max-width:700px) { .app { width:100%; height:100vh; min-height:0; margin:0; box-shadow:none; } .topbar { padding:10px 12px; } .model-wrap span { display:none; } .model-wrap select { max-width:118px; } .compare-toggle { padding:8px; font-size:0; } .compare-toggle::before { content:'⇄'; font-size:16px; } .more { display:none; } .messages { padding:18px 10px 12px; } .msg-row { max-width:89%; } .welcome { margin:auto 6px; } .composer-zone { padding:9px 7px 11px; } .icon-button { display:none; } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="identity">
+          <div class="avatar">BA</div>
+          <div><div class="name">Brain Academy Assistant</div><div class="presence"><span class="presence-dot" id="statusDot"></span><span id="statusText">Memeriksa koneksi…</span></div></div>
+        </div>
+        <div class="controls"><label class="model-wrap"><span>Model</span><select id="model" aria-label="Pilih model"></select></label><button class="compare-toggle" id="compareToggle" type="button">Bandingkan model</button><button class="more" type="button" aria-label="Info">⋮</button></div>
+      </header>
+      <section class="conversation">
+        <div class="messages" id="messages">
+          <div class="welcome" id="empty">
+            <div class="welcome-icon">✦</div><h1>Halo, ada yang bisa dibantu?</h1>
+            <p>Tanyakan informasi dari knowledge base Brain Academy. Pilihan model dapat diganti di bagian atas, atau gunakan mode bandingkan untuk melihat beberapa jawaban sekaligus.</p>
+            <div class="suggestions"><button class="suggestion">Apa saja komponen SKD sekolah kedinasan 2026?</button><button class="suggestion">Apa yang tersedia tentang TKA SMA?</button><button class="suggestion">Apa status sumber Juknis IPDN 2026?</button></div>
+          </div>
+        </div>
+        <div class="composer-zone"><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Tulis pesan" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Knowledge base · ekstraksi 6 Oktober 2026</div></div>
+      </section>
+    </div>
+    <script>
+      const modelEl = document.getElementById('model');
+      const messagesEl = document.getElementById('messages');
+      const emptyEl = document.getElementById('empty');
+      const inputEl = document.getElementById('input');
+      const sendEl = document.getElementById('send');
+      const compareToggle = document.getElementById('compareToggle');
+      const statusText = document.getElementById('statusText');
+      const statusDot = document.getElementById('statusDot');
+      const modeNote = document.getElementById('modeNote');
+      let compareMode = false;
+      const compareHistories = { 'gpt-6-luna': [], 'gpt-5.6-luna': [], 'gpt-5.5': [] };
+
+      function clock() { return new Intl.DateTimeFormat('id-ID', { hour:'2-digit', minute:'2-digit' }).format(new Date()); }
+      function addMessage(kind, text, meta) {
+        if (emptyEl) emptyEl.remove();
+        const row = document.createElement('div'); row.className = `msg-row ${kind}`;
+        const bubble = document.createElement('div'); bubble.className = 'msg'; bubble.textContent = text; row.appendChild(bubble);
+        const stamp = document.createElement('div'); stamp.className = 'msg-meta'; stamp.textContent = `${meta || (kind === 'user' ? 'Anda' : 'Brain Academy Assistant')} · ${clock()}`;
+        if (kind === 'user') { const tick = document.createElement('span'); tick.className = 'tick'; tick.textContent = '✓✓'; stamp.appendChild(tick); }
+        row.appendChild(stamp); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      function addSources(sources) {
+        if (!sources || !sources.length) return;
+        const wrap = document.createElement('div'); wrap.className = 'sources';
+        sources.forEach((source) => { const card = document.createElement('div'); card.className = 'source'; const title = document.createElement('strong'); title.textContent = source.title || source.filename || 'Sumber'; const meta = document.createElement('span'); meta.textContent = `${source.profile || 'Knowledge base'} · ${source.status || 'citation'}`; card.append(title, meta); wrap.appendChild(card); });
+        messagesEl.appendChild(wrap); messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      function showCompareLoading(question, models) {
+        if (emptyEl) emptyEl.remove();
+        document.querySelectorAll('.compare-view').forEach((view) => view.remove());
+        const view = document.createElement('div'); view.className = 'compare-view'; view.id = 'compareView';
+        models.forEach((model) => { const pane = document.createElement('article'); pane.className = 'model-pane'; pane.innerHTML = `<div class="model-pane-head"><div class="model-pane-title">${model}</div><div class="model-pane-status">Sedang menyiapkan jawaban…</div></div><div class="model-pane-body"><div class="compare-history"><div class="compare-bubble user"></div><div class="compare-bubble assistant">Menunggu respons model…</div></div></div>`; pane.querySelector('.compare-bubble.user').textContent = question; view.appendChild(pane); });
+        messagesEl.appendChild(view); messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      function showCompareResults(payload) {
+        const view = document.getElementById('compareView'); if (!view) return;
+        view.innerHTML = '';
+        payload.results.forEach((result) => { const history = compareHistories[result.model] || (compareHistories[result.model] = []); history.push({ role:'user', content:payload.question }, { role:'assistant', content:result.answer || 'Tidak ada jawaban.' }); const pane = document.createElement('article'); pane.className = 'model-pane'; const head = document.createElement('div'); head.className = 'model-pane-head'; const title = document.createElement('div'); title.className = 'model-pane-title'; title.textContent = result.model; const status = document.createElement('div'); status.className = 'model-pane-status'; status.textContent = result.mode === 'openai-file-search' ? 'File Search' : 'Demo lokal / fallback'; head.append(title, status); const body = document.createElement('div'); body.className = 'model-pane-body'; const thread = document.createElement('div'); thread.className = 'compare-history'; history.forEach((item) => { const bubble = document.createElement('div'); bubble.className = `compare-bubble ${item.role}`; bubble.textContent = item.content; thread.appendChild(bubble); }); body.appendChild(thread); if (result.warning) { const warning = document.createElement('div'); warning.className = 'model-pane-status'; warning.textContent = result.warning; body.appendChild(warning); } if (result.sources?.length) { const sources = document.createElement('div'); sources.className = 'compare-sources'; result.sources.forEach((source) => { const item = document.createElement('div'); item.className = 'compare-source'; item.innerHTML = `<strong></strong>${source.status || 'source'}`; item.querySelector('strong').textContent = source.title || 'Sumber'; sources.appendChild(item); }); body.appendChild(sources); } pane.append(head, body); view.appendChild(pane); });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); config.models.forEach((model) => { const opt = document.createElement('option'); opt.value = model; opt.textContent = model; modelEl.appendChild(opt); }); modelEl.value = config.defaultModel; const live = config.hasApiKey && config.hasVectorStore; statusText.textContent = live ? 'knowledge base tersambung' : 'mode demo lokal'; statusDot.classList.toggle('ready', live); modeNote.textContent = `${live ? 'File Search · ' : 'Demo lokal · '}${config.localDocuments} dokumen · ekstraksi 6 Oktober 2026`; }
+      document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { inputEl.value = button.textContent; inputEl.focus(); }));
+      inputEl.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.getElementById('composer').requestSubmit(); } });
+      compareToggle.addEventListener('click', () => { compareMode = !compareMode; compareToggle.classList.toggle('active', compareMode); compareToggle.textContent = compareMode ? 'Mode chat biasa' : 'Bandingkan model'; modelEl.disabled = compareMode; modeNote.textContent = compareMode ? 'Mode bandingkan · satu pertanyaan ke 3 model' : 'Knowledge base · ekstraksi 6 Oktober 2026'; });
+      document.getElementById('composer').addEventListener('submit', async (event) => {
+        event.preventDefault(); const message = inputEl.value.trim(); if (!message) return; const models = ['gpt-6-luna', 'gpt-5.6-luna', 'gpt-5.5'];
+        if (compareMode) {
+          inputEl.value = ''; sendEl.disabled = true; sendEl.textContent = '…'; showCompareLoading(message, models);
+          try { const response = await fetch('/api/compare', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ message, models, histories:compareHistories }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal membandingkan model.'); showCompareResults(data); }
+          catch (error) { const view = document.getElementById('compareView'); if (view) view.innerHTML = `<div class="compare-empty">Gagal membandingkan model: ${error.message}</div>`; }
+          finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
+          return;
+        }
+        addMessage('user', message, 'Anda'); inputEl.value = ''; sendEl.disabled = true; sendEl.textContent = '…';
+        try { const response = await fetch('/api/chat', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ message, model:modelEl.value }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.mode === 'openai-file-search' ? data.model : 'Demo lokal'); addSources(data.sources || data.citations || []); }
+        catch (error) { addMessage('assistant', `Terjadi kendala: ${error.message}`, 'Error'); } finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
+      });
+      loadConfig().catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
+    </script>
+  </body>
+</html>
