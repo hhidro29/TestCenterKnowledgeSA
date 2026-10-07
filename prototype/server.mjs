@@ -6,16 +6,21 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
 const PORT = Number(process.env.PORT || 4310);
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
-const OPENAI_VECTOR_STORE_ID = process.env.OPENAI_VECTOR_STORE_ID || "";
-const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "gpt-6-luna";
-const OPENAI_BASE_URL = "https://api.openai.com/v1";
+const HOST = process.env.HOST || "0.0.0.0";
+const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+const MAX_MESSAGE_LENGTH = 4000;
+const MAX_CONTEXT_CHARS = 24000;
+const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
 
-const MODELS = ["gpt-6-luna", "gpt-5.6-luna", "gpt-5.5"];
-const PROFILE_LABELS = { all: "Semua profil" };
+const PROFILE_LABELS = { all: "Semua knowledge base" };
+const MODELS = [GEMINI_MODEL];
 
 let systemPrompt = "";
 let localDocs = [];
+const requestLog = new Map();
 
 async function loadData() {
   const promptPath = path.join(ROOT, "Prompt Sistem Chatbot - Knowledge Base Terstruktur.md");
@@ -37,8 +42,11 @@ async function loadData() {
     const metadata = {};
     if (front) {
       for (const line of front[1].split(/\r?\n/)) {
-        const match = line.match(/^([\w_]+):\s*"?(.*?)"?$/);
-        if (match) metadata[match[1]] = match[2].replace(/^"|"$/g, "");
+        const match = line.match(/^[\w_]+:\s*"?(.*?)"?$/);
+        if (match) {
+          const key = line.split(":", 1)[0].trim();
+          metadata[key] = match[1].replace(/^"|"$/g, "");
+        }
       }
     }
     localDocs.push({ relative, content, metadata, title: metadata.title || path.basename(relative) });
@@ -52,7 +60,10 @@ function json(res, status, body) {
 
 async function readBody(req) {
   let body = "";
-  for await (const chunk of req) body += chunk;
+  for await (const chunk of req) {
+    body += chunk;
+    if (body.length > 100_000) throw new Error("Request terlalu besar.");
+  }
   return body ? JSON.parse(body) : {};
 }
 
@@ -96,13 +107,12 @@ function relevantExcerpts(doc, terms) {
     return terms.some((term) => new RegExp(`\\b${term}\\b`, "i").test(normalized));
   });
   const fallback = lines.filter((line) => line.length > 35 && !line.startsWith("http"));
-  return [...new Set([...matching, ...fallback])].slice(0, 2);
+  return [...new Set([...matching, ...fallback])].slice(0, 4);
 }
 
-function localSearch(query, profile) {
+function retrieve(query) {
   const terms = queryTerms(query);
   const candidates = localDocs
-    .filter((doc) => profile === "all" || doc.relative.startsWith(`${profile}/`))
     .map((doc) => {
       const title = normalize(doc.title);
       const body = normalize(doc.content);
@@ -115,15 +125,8 @@ function localSearch(query, profile) {
     })
     .filter((doc) => doc.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 4);
+    .slice(0, 5);
 
-  if (!candidates.length) {
-    return {
-      mode: "demo-local",
-      answer: "Aku belum menemukan bagian knowledge base yang cukup relevan untuk pertanyaan ini. Coba tambahkan nama topik, program, atau tahun yang lebih spesifik.",
-      sources: [],
-    };
-  }
   const sources = candidates.map((doc) => ({
     title: doc.title,
     path: doc.relative,
@@ -132,127 +135,122 @@ function localSearch(query, profile) {
     url: doc.metadata.source_url || "",
   }));
   const excerpts = candidates
-    .map((doc) => ({ title: doc.title, lines: relevantExcerpts(doc, terms) }))
+    .map((doc) => ({ title: doc.title, path: doc.relative, lines: relevantExcerpts(doc, terms) }))
     .filter((item) => item.lines.length);
-  const answer = excerpts.length
-    ? [
-        "Berikut ringkasan yang ditemukan di knowledge base:",
-        ...excerpts.map((item) => `\n${item.title}\n${item.lines.map((line) => `• ${line}`).join("\n")}`),
-      ].join("\n")
-    : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
-  return {
-    mode: "demo-local",
-    answer,
-    sources,
-  };
+  const context = excerpts
+    .map((item) => `Dokumen: ${item.title}\nPath: ${item.path}\n${item.lines.map((line) => `- ${line}`).join("\n")}`)
+    .join("\n\n")
+    .slice(0, MAX_CONTEXT_CHARS);
+
+  return { candidates, context, sources };
 }
 
-async function callOpenAI({ message, model, profile, input }) {
-  const profileInstruction =
-    profile && profile !== "all"
-      ? `\nPengguna memilih profil ${PROFILE_LABELS[profile] || profile}. Prioritaskan dokumen dengan profile_id ${profile}.`
-      : "";
-  const response = await fetch(`${OPENAI_BASE_URL}/responses`, {
+function localSearch(query) {
+  const retrieved = retrieve(query);
+  if (!retrieved.candidates.length) {
+    return {
+      mode: "demo-local",
+      model: "local-retrieval",
+      answer: "Aku belum menemukan bagian knowledge base yang cukup relevan untuk pertanyaan ini. Coba tambahkan nama topik, program, atau tahun yang lebih spesifik.",
+      sources: [],
+    };
+  }
+  const answer = retrieved.context
+    ? [
+        "Aku menemukan beberapa bagian yang relevan di knowledge base:",
+        ...retrieved.context.split(/\n\n/).map((block) => `\n${block}`),
+      ].join("\n")
+    : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
+  return { mode: "demo-local", model: "local-retrieval", answer, sources: retrieved.sources };
+}
+
+function buildPrompt(message, context) {
+  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.\n- Jika menyebut sumber, gunakan judul dokumen yang tersedia.\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
+}
+
+async function callGemini({ message, history = [] }) {
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY belum dikonfigurasi.");
+  const retrieved = retrieve(message);
+  const contents = [
+    ...history.slice(-10).map((item) => ({
+      role: item.role === "assistant" ? "model" : "user",
+      parts: [{ text: String(item.content || "").slice(0, MAX_MESSAGE_LENGTH) }],
+    })),
+    { role: "user", parts: [{ text: buildPrompt(message, retrieved.context) }] },
+  ];
+  const endpoint = `${GEMINI_BASE_URL}/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const response = await fetch(endpoint, {
     method: "POST",
-    headers: { authorization: `Bearer ${OPENAI_API_KEY}`, "content-type": "application/json" },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      model: model || DEFAULT_MODEL,
-      instructions: `${systemPrompt}${profileInstruction}`,
-      input: input || message,
-      tools: [{ type: "file_search", vector_store_ids: [OPENAI_VECTOR_STORE_ID], max_num_results: 8 }],
-      include: ["file_search_call.results"],
+      contents,
+      generationConfig: { temperature: 0.2, maxOutputTokens: 700 },
     }),
   });
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const detail = data?.error?.message || `OpenAI API error (${response.status})`;
+    const detail = data?.error?.message || `Gemini API error (${response.status})`;
     throw new Error(detail);
   }
-  const messageItems = (data.output || []).filter((item) => item.type === "message");
-  const answer = messageItems
-    .flatMap((item) => item.content || [])
-    .filter((item) => item.type === "output_text")
-    .map((item) => item.text)
+  const answer = (data.candidates || [])
+    .flatMap((candidate) => candidate.content?.parts || [])
+    .map((part) => part.text || "")
     .join("\n")
     .trim();
-  const annotations = messageItems
-    .flatMap((item) => item.content || [])
-    .flatMap((item) => item.annotations || [])
-    .filter((annotation) => annotation.type === "file_citation")
-    .map((annotation) => ({ filename: annotation.filename, fileId: annotation.file_id }));
-  return { mode: "openai-file-search", model: model || DEFAULT_MODEL, answer, citations: annotations, sources: [] };
+  if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
+  return { mode: "gemini", model: GEMINI_MODEL, answer, sources: retrieved.sources };
+}
+
+function isRateLimited(req) {
+  if (!MAX_REQUESTS_PER_MINUTE || MAX_REQUESTS_PER_MINUTE < 1) return false;
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  const key = forwarded || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  const recent = (requestLog.get(key) || []).filter((time) => now - time < 60_000);
+  if (recent.length >= MAX_REQUESTS_PER_MINUTE) {
+    requestLog.set(key, recent);
+    return true;
+  }
+  recent.push(now);
+  requestLog.set(key, recent);
+  return false;
 }
 
 async function handle(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   if (req.method === "GET" && url.pathname === "/api/config") {
     return json(res, 200, {
-      hasApiKey: Boolean(OPENAI_API_KEY),
-      hasVectorStore: Boolean(OPENAI_VECTOR_STORE_ID),
-      defaultModel: DEFAULT_MODEL,
+      provider: AI_PROVIDER,
+      hasApiKey: Boolean(GEMINI_API_KEY),
+      defaultModel: GEMINI_MODEL,
       models: MODELS,
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
+      mode: GEMINI_API_KEY ? "gemini" : "demo-local",
     });
   }
   if (req.method === "POST" && url.pathname === "/api/chat") {
     try {
+      if (isRateLimited(req)) return json(res, 429, { error: "Batas penggunaan sementara tercapai. Coba lagi sebentar." });
       const body = await readBody(req);
-      const message = String(body.message || "").trim();
+      const message = String(body.message || "").trim().slice(0, MAX_MESSAGE_LENGTH);
       if (!message) return json(res, 400, { error: "Pertanyaan masih kosong." });
-      const model = MODELS.includes(body.model) ? body.model : DEFAULT_MODEL;
-      const profile = "all";
-      if (OPENAI_API_KEY && OPENAI_VECTOR_STORE_ID) {
+      const history = Array.isArray(body.history) ? body.history : [];
+      if (GEMINI_API_KEY && AI_PROVIDER === "gemini") {
         try {
-          return json(res, 200, await callOpenAI({ message, model, profile }));
+          return json(res, 200, await callGemini({ message, history }));
         } catch (error) {
-          const fallback = localSearch(message, profile);
-          const warning = /no credits|insufficient|billing/i.test(error.message || "")
-            ? "Mode demo lokal aktif sementara karena akun API belum memiliki credits."
-            : "Model AI belum tersedia; prototype memakai mode demo lokal.";
+          const fallback = localSearch(message);
           return json(res, 200, {
             ...fallback,
             mode: "demo-local-fallback",
-            warning,
+            warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
           });
         }
       }
-      return json(res, 200, localSearch(message, profile));
+      return json(res, 200, localSearch(message));
     } catch (error) {
       return json(res, 500, { error: error.message || "Gagal memproses pertanyaan." });
-    }
-  }
-  if (req.method === "POST" && url.pathname === "/api/compare") {
-    try {
-      const body = await readBody(req);
-      const message = String(body.message || "").trim();
-      if (!message) return json(res, 400, { error: "Pertanyaan masih kosong." });
-      const models = Array.isArray(body.models) && body.models.length
-        ? body.models.filter((model) => MODELS.includes(model))
-        : MODELS;
-      const results = await Promise.all(models.map(async (model) => {
-        if (OPENAI_API_KEY && OPENAI_VECTOR_STORE_ID) {
-          try {
-            const previous = Array.isArray(body.histories?.[model]) ? body.histories[model].slice(-10) : [];
-            const input = [...previous, { role: "user", content: message }];
-            return await callOpenAI({ message, model, profile: "all", input });
-          } catch (error) {
-            const fallback = localSearch(message, "all");
-            return {
-              ...fallback,
-              model,
-              mode: "demo-local-fallback",
-              warning: /no credits|insufficient|billing/i.test(error.message || "")
-                ? "Mode demo lokal aktif sementara karena akun API belum memiliki credits."
-                : "Model AI belum tersedia; prototype memakai mode demo lokal.",
-            };
-          }
-        }
-        return { ...localSearch(message, "all"), model };
-      }));
-      return json(res, 200, { question: message, results });
-    } catch (error) {
-      return json(res, 500, { error: error.message || "Gagal membandingkan model." });
     }
   }
   if (req.method === "GET") {
@@ -272,8 +270,8 @@ async function handle(req, res) {
 }
 
 await loadData();
-http.createServer(handle).listen(PORT, "127.0.0.1", () => {
-  console.log(`Knowledge chatbot prototype: http://127.0.0.1:${PORT}`);
+http.createServer(handle).listen(PORT, HOST, () => {
+  console.log(`Knowledge chatbot prototype: http://${HOST}:${PORT}`);
   console.log(`Local documents loaded: ${localDocs.length}`);
-  console.log(`OpenAI File Search: ${OPENAI_API_KEY && OPENAI_VECTOR_STORE_ID ? "enabled" : "demo-local mode"}`);
+  console.log(`AI provider: ${AI_PROVIDER} · model: ${GEMINI_MODEL} · ${GEMINI_API_KEY ? "enabled" : "demo-local mode"}`);
 });

@@ -1,41 +1,46 @@
 # Knowledge Chatbot Prototype
 
-MVP lokal untuk menguji knowledge base Linktree dengan model yang bisa diganti.
+Prototype chat UI untuk mencoba knowledge base Linktree/Brain Academy. MVP ini memakai satu model hosted gratis supaya bisa dibagikan lewat URL publik.
 
-## 1. Jalankan demo lokal
+## Jalankan lokal
 
-Tidak perlu install dependency tambahan. Dari folder workspace:
+Dari folder `prototype/`:
 
 ```bash
-node prototype/server.mjs
+cp .env.example .env
+npm start
 ```
 
 Buka <http://127.0.0.1:4310>.
 
-Tanpa environment variable, aplikasi berjalan dalam **demo-local mode**: aplikasi mencari dokumen paling relevan dari `knowledge-base/` dan menampilkan potongan sumber. Mode ini berguna untuk mengecek foldering dan retrieval awal, tetapi belum menghasilkan jawaban AI penuh.
+Tanpa `GEMINI_API_KEY`, aplikasi tetap berjalan dalam `demo-local`: server melakukan retrieval sederhana dari folder `knowledge-base/` dan menampilkan potongan sumber. Dengan key, server memakai Gemini API.
 
-## 2. Aktifkan OpenAI File Search
+## Model dan API key
 
-Buat vector store dari daftar file yang sudah dipilih:
+Model default adalah `gemini-2.5-flash-lite`, model ringan dengan free tier di Google AI Studio. Buat API key di <https://aistudio.google.com/apikey>, lalu isi environment variable:
 
 ```bash
-export OPENAI_API_KEY="..."
-node prototype/create-vector-store.mjs
-export OPENAI_VECTOR_STORE_ID="vs_..."
-node prototype/server.mjs
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash-lite
 ```
 
-`create-vector-store.mjs` membaca `knowledge-base/00-catalog/ingest-default.txt`, mengunggah dokumen fakta, dan mencetak ID vector store. Jangan menaruh API key di file yang di-commit.
+Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun Gemini API. API key hanya dibaca server; jangan menaruh nilainya di GitHub.
 
-Model dapat diganti dari panel kiri. Prototype ini dibatasi ke model kelas Luna dan di bawahnya: `gpt-6-luna`, `gpt-5.6-luna`, dan `gpt-5.5`. Filter profil sengaja tidak ditampilkan supaya setiap pertanyaan memakai seluruh knowledge base. Untuk perbandingan yang adil, gunakan pertanyaan dan knowledge base yang sama pada chat baru atau sesi uji yang terpisah.
+## Deploy publik dengan Render
 
-## Mode bandingkan
+Repository sudah memiliki `render.yaml` di root. Di Render pilih **New Blueprint**, hubungkan repository GitHub ini, lalu isi secret `GEMINI_API_KEY` ketika diminta. Render akan memakai `prototype/` sebagai root, menjalankan `npm install` dan `npm start`, lalu memberi URL publik.
 
-Klik **Bandingkan model** di header. Satu pertanyaan akan dikirim ke tiga panel model sekaligus. Setiap panel menyimpan riwayat percakapannya sendiri, sehingga pertanyaan lanjutan tetap memakai konteks model tersebut. Pada layar sempit, panel tetap berdampingan dan dapat digeser horizontal.
+Variabel yang dipakai:
 
-## 3. Struktur mode
+- `GEMINI_API_KEY`: wajib untuk jawaban AI.
+- `GEMINI_MODEL`: default `gemini-2.5-flash-lite`.
+- `MAX_REQUESTS_PER_MINUTE`: batas sederhana per alamat IP, default 30.
 
-- `demo-local`: retrieval lokal tanpa API.
-- `openai-file-search`: Responses API + File Search + vector store.
+## Cara kerja
 
-Prompt sistem berada di `Prompt Sistem Chatbot - Knowledge Base Terstruktur.md` dan dipakai oleh server saat mode OpenAI aktif.
+1. Pertanyaan masuk ke server.
+2. Server mengambil potongan dokumen yang paling relevan dari `knowledge-base/`.
+3. Pertanyaan dan konteks dikirim ke Gemini.
+4. Jawaban ditampilkan seperti chat WhatsApp/Telegram bersama kartu sumber.
+
+Jika Gemini gagal atau kuota habis, aplikasi memberi jawaban retrieval lokal dan menandainya sebagai fallback.
