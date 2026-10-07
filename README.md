@@ -12,7 +12,7 @@ npm start
 
 Buka <http://127.0.0.1:4310/>.
 
-Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI, isi `GEMINI_API_KEY` dari Google AI Studio. Model default adalah `gemini-2.5-flash-lite` dan bisa diganti lewat `GEMINI_MODEL`.
+Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI, isi `GEMINI_API_KEY` dari Google AI Studio. Model default adalah `gemini-3.5-flash-lite` dan bisa diganti lewat `GEMINI_MODEL`.
 
 ## Deploy publik
 

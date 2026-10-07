@@ -5,11 +5,21 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
+
+// Load local secrets when running from the repository. Hosting platforms inject
+// environment variables themselves, so existing variables always win.
+const localEnv = await fs.readFile(path.join(HERE, ".env"), "utf8").catch(() => "");
+for (const line of localEnv.split(/\r?\n/)) {
+  const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+  if (!match || match[1] in process.env) continue;
+  process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, "");
+}
+
 const PORT = Number(process.env.PORT || 4310);
 const HOST = process.env.HOST || "0.0.0.0";
 const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_CONTEXT_CHARS = 24000;
