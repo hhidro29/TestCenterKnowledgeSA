@@ -226,7 +226,7 @@ async function handle(req, res) {
       models: MODELS,
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
-      mode: GEMINI_API_KEY ? "gemini" : "demo-local",
+      mode: AI_PROVIDER === "gemini" && GEMINI_API_KEY ? "gemini" : "demo-local",
     });
   }
   if (req.method === "POST" && url.pathname === "/api/chat") {
