@@ -64,7 +64,9 @@ async function loadData() {
         }
       }
     }
-    localDocs.push({ relative, content, metadata, title: metadata.title || path.basename(relative) });
+    const doc = { relative, content, metadata, title: metadata.title || path.basename(relative) };
+    doc.chunks = makeChunks(doc);
+    localDocs.push(doc);
   }
 }
 
@@ -91,9 +93,12 @@ function normalize(value) {
 }
 
 const STOPWORDS = new Set([
-  "ada", "agar", "akan", "aku", "apa", "atau", "bagi", "bahwa", "berapa", "bisa", "dan", "dari", "dengan",
-  "di", "dalam", "ini", "jadi", "juga", "ke", "kamu", "karena", "mana", "mau", "menurut", "oleh", "pada",
-  "saja", "saya", "sebagai", "sebutkan", "sistem", "tentang", "terkait", "tidak", "untuk", "yang", "nya",
+  "ada", "adalah", "agar", "akan", "aku", "anda", "apa", "apakah", "atau", "bagaimana", "bagi", "bahwa", "belum",
+  "berapa", "berdasarkan", "bisa", "dan", "dapat", "dari", "dengan", "di", "dalam", "dijelaskan", "ini", "itu",
+  "jadi", "juga", "kami", "kamu", "karena", "ke", "kemungkinan", "ketika", "mana", "masih", "mau", "menurut",
+  "menyiapkan", "perlu", "oleh", "pada", "pasti", "saja", "saya", "sebagai", "sebutkan", "sebuah", "sistem",
+  "sumber", "tadi", "tentang", "terkait", "tersebut", "tidak", "untuk", "ulang", "yang", "nya", "the", "and",
+  "what", "how", "does", "from", "based", "please", "tell", "need", "want", "should", "could", "with", "have",
 ]);
 
 function queryTerms(query) {
@@ -116,53 +121,86 @@ function cleanExcerpt(value) {
     .trim();
 }
 
-function relevantExcerpts(doc, terms) {
+function makeChunks(doc) {
   const body = doc.content.replace(/^---[\s\S]*?---\s*/, "");
-  const lines = body
-    .split(/\r?\n/)
-    .map(cleanExcerpt)
-    .filter((line) => line && !/^\|?\s*[-:|]+\s*\|?$/.test(line) && !/^sumber:/i.test(line));
-  const matching = lines.filter((line) => {
-    const normalized = normalize(line);
-    return terms.some((term) => new RegExp(`\\b${term}\\b`, "i").test(normalized));
-  });
-  const fallback = lines.filter((line) => line.length > 35 && !line.startsWith("http"));
-  return [...new Set([...matching, ...fallback])].slice(0, 4);
+  const lines = body.split(/\r?\n/).map(cleanExcerpt).filter((line) =>
+    line && !/^\|?\s*[-:|]+\s*\|?$/.test(line) && !/^sumber:/i.test(line) && !/^status:/i.test(line)
+  );
+  const chunks = [];
+  let current = [];
+  let length = 0;
+  const flush = () => {
+    if (!current.length) return;
+    const text = current.join(" ").trim();
+    if (text.length > 25) chunks.push({ text, normalized: normalize(text) });
+    current = [];
+    length = 0;
+  };
+  for (const line of lines) {
+    if (length + line.length > 700 && current.length) flush();
+    if (line.length > 850) {
+      for (let index = 0; index < line.length; index += 700) {
+        const text = line.slice(index, index + 700).trim();
+        if (text.length > 25) chunks.push({ text, normalized: normalize(text) });
+      }
+      continue;
+    }
+    current.push(line);
+    length += line.length + 1;
+  }
+  flush();
+  return chunks;
 }
 
 function retrieve(query) {
   const terms = queryTerms(query);
-  const candidates = localDocs
-    .map((doc) => {
-      const title = normalize(doc.title);
-      const body = normalize(doc.content);
+  if (!terms.length) return { candidates: [], context: "", sources: [] };
+  const yearTerms = new Set(terms.filter((term) => /^20\d\d$/.test(term)));
+  const topicTerms = terms.filter((term) => !yearTerms.has(term));
+  const ranked = [];
+  for (const doc of localDocs) {
+    const title = normalize(doc.title);
+    for (const chunk of doc.chunks) {
       let score = 0;
+      let matchedTopics = 0;
       for (const term of terms) {
-        if (new RegExp(`\\b${term}\\b`, "i").test(title)) score += 10;
-        score += Math.min((body.match(new RegExp(`\\b${term}\\b`, "g")) || []).length, 8);
+        const pattern = new RegExp(`\\b${term}\\b`, "g");
+        const titleHits = (title.match(pattern) || []).length;
+        const bodyHits = (chunk.normalized.match(pattern) || []).length;
+        if (titleHits || bodyHits) {
+          const weight = yearTerms.has(term) ? 0.5 : 2;
+          score += Math.min(bodyHits, 3) * weight + titleHits * (yearTerms.has(term) ? 1 : 6);
+          if (!yearTerms.has(term)) matchedTopics += 1;
+        }
       }
-      return { ...doc, score };
-    })
-    .filter((doc) => doc.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
-
+      if (matchedTopics > 0) {
+        ranked.push({ ...doc, chunk: chunk.text, score, matchedTopics });
+      }
+    }
+  }
+  ranked.sort((a, b) => b.score - a.score || b.matchedTopics - a.matchedTopics);
+  const selected = [];
+  const perDoc = new Map();
+  for (const candidate of ranked) {
+    const count = perDoc.get(candidate.relative) || 0;
+    if (count >= 2) continue;
+    selected.push(candidate);
+    perDoc.set(candidate.relative, count + 1);
+    if (selected.length >= 8) break;
+  }
+  const candidates = [...new Map(selected.map((item) => [item.relative, item])).values()];
   const sources = candidates.map((doc) => ({
     title: doc.title,
     path: doc.relative,
     profile: PROFILE_LABELS[doc.metadata.profile_id] || doc.metadata.profile || "Knowledge base",
     status: doc.metadata.source_status || "verified_extracted",
     url: doc.metadata.source_url || "",
-  })).filter((source, index, all) => all.findIndex((item) => item.title === source.title && item.path === source.path) === index).slice(0, 4);
-  const excerpts = candidates
-    .map((doc) => ({ title: doc.title, path: doc.relative, lines: relevantExcerpts(doc, terms) }))
-    .filter((item) => item.lines.length);
-  const context = excerpts
-    .map((item) => `Dokumen: ${item.title}\nPath: ${item.path}\n${item.lines.map((line) => `- ${line}`).join("\n")}`)
+  })).slice(0, 4);
+  const context = selected
+    .map((item) => `Dokumen: ${item.title}\nPath: ${item.relative}\nStatus: ${item.metadata.source_status || "verified_extracted"}\nKutipan relevan: ${item.chunk}`)
     .join("\n\n")
     .slice(0, MAX_CONTEXT_CHARS);
-
-  return { candidates, context, sources };
+  return { candidates, context, sources, selected };
 }
 
 function localSearch(query) {
@@ -183,11 +221,8 @@ function localSearch(query) {
       sources: [],
     };
   }
-  const answer = retrieved.context
-    ? [
-        "Aku menemukan beberapa bagian yang relevan di knowledge base:",
-        ...retrieved.context.split(/\n\n/).map((block) => `\n${block}`),
-      ].join("\n")
+  const answer = retrieved.selected?.length
+    ? ["Aku menemukan bagian berikut di knowledge base:", ...retrieved.selected.map((item) => `\n${item.title}\n${item.chunk}`)].join("\n")
     : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
   return { mode: "demo-local", model: "local-retrieval", answer, sources: retrieved.sources };
 }
