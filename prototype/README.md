@@ -17,14 +17,15 @@ Tanpa `GEMINI_API_KEY`, aplikasi tetap berjalan dalam `demo-local`: server melak
 
 ## Model dan API key
 
-Model default adalah `gemini-3.5-flash-lite`, model ringan dengan free tier di Google AI Studio. Buat API key di <https://aistudio.google.com/apikey>, lalu isi environment variable:
+Model default saat provider `groq` adalah `qwen/qwen3.8-27b`. Buat API key di <https://console.groq.com/keys>, lalu isi environment variable:
 
 ```bash
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-3.5-flash-lite
+AI_PROVIDER=groq
+GROQ_API_KEY=...
+GROQ_MODEL=qwen/qwen3.8-27b
 ```
 
-Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun Gemini API. API key hanya dibaca server; jangan menaruh nilainya di GitHub.
+Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun Groq. API key hanya dibaca server; jangan menaruh nilainya di GitHub. Untuk kembali ke Gemini, gunakan `AI_PROVIDER=gemini` dan `GEMINI_API_KEY`.
 
 ## Deploy publik dengan Render
 

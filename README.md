@@ -12,16 +12,16 @@ npm start
 
 Buka <http://127.0.0.1:4310/>.
 
-Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI, isi `GEMINI_API_KEY` dari Google AI Studio. Model default adalah `gemini-3.5-flash-lite` dan bisa diganti lewat `GEMINI_MODEL`.
+Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI dengan Qwen, isi `GROQ_API_KEY` dan gunakan `AI_PROVIDER=groq`. Model default adalah `qwen/qwen3.8-27b`. Gemini tetap tersedia dengan `AI_PROVIDER=gemini`.
 
 ## Deploy publik
 
 Repository ini juga sudah memiliki konfigurasi Vercel. Import repository di Vercel dengan **Root Directory** tetap di root repository, lalu tambahkan environment variable berikut pada **Production** dan **Preview**:
 
 ```text
-AI_PROVIDER=gemini
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-3.5-flash-lite
+AI_PROVIDER=groq
+GROQ_API_KEY=...
+GROQ_MODEL=qwen/qwen3.8-27b
 MAX_REQUESTS_PER_MINUTE=30
 ```
 

@@ -21,12 +21,17 @@ const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+const GROQ_MODEL = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
+const GROQ_BASE_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_CONTEXT_CHARS = 24000;
 const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
 
 const PROFILE_LABELS = { all: "Semua knowledge base" };
-const MODELS = [GEMINI_MODEL];
+const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
+const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
+const MODELS = [ACTIVE_MODEL];
 
 let systemPrompt = "";
 let localDocs = [];
@@ -161,6 +166,14 @@ function retrieve(query) {
 }
 
 function localSearch(query) {
+  if (isGreeting(query)) {
+    return {
+      mode: "demo-local",
+      model: "local-retrieval",
+      answer: "Halo! Ada yang bisa aku bantu hari ini?",
+      sources: [],
+    };
+  }
   const retrieved = retrieve(query);
   if (!retrieved.candidates.length) {
     return {
@@ -180,7 +193,11 @@ function localSearch(query) {
 }
 
 function buildPrompt(message, context) {
-  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
+  return `${buildInstructions()}\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
+}
+
+function buildInstructions() {
+  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
 }
 
 async function callGemini({ message, history = [] }) {
@@ -216,6 +233,32 @@ async function callGemini({ message, history = [] }) {
   return { mode: "gemini", model: GEMINI_MODEL, answer, sources: retrieved.sources };
 }
 
+async function callGroq({ message, history = [] }) {
+  if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY belum dikonfigurasi.");
+  const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
+  const messages = [
+    { role: "system", content: buildInstructions() },
+    ...history.slice(-10).map((item) => ({
+      role: item.role === "assistant" ? "assistant" : "user",
+      content: String(item.content || "").slice(0, MAX_MESSAGE_LENGTH),
+    })),
+    { role: "user", content: `${message}\n\nKONTEKS KNOWLEDGE BASE:\n${retrieved.context || "Tidak ada konteks relevan yang ditemukan."}` },
+  ];
+  const response = await fetch(GROQ_BASE_URL, {
+    method: "POST",
+    headers: { authorization: `Bearer ${GROQ_API_KEY}`, "content-type": "application/json" },
+    body: JSON.stringify({ model: GROQ_MODEL, messages, temperature: 0.2, max_tokens: 700 }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const detail = data?.error?.message || `Groq API error (${response.status})`;
+    throw new Error(detail);
+  }
+  const answer = data.choices?.[0]?.message?.content?.trim();
+  if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
+  return { mode: "groq", model: GROQ_MODEL, answer, sources: retrieved.sources };
+}
+
 function isRateLimited(req) {
   if (!MAX_REQUESTS_PER_MINUTE || MAX_REQUESTS_PER_MINUTE < 1) return false;
   const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
@@ -236,12 +279,12 @@ async function handle(req, res) {
   if (req.method === "GET" && url.pathname === "/api/config") {
     return json(res, 200, {
       provider: AI_PROVIDER,
-      hasApiKey: Boolean(GEMINI_API_KEY),
-      defaultModel: GEMINI_MODEL,
+      hasApiKey: Boolean(ACTIVE_API_KEY),
+      defaultModel: ACTIVE_MODEL,
       models: MODELS,
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
-      mode: AI_PROVIDER === "gemini" && GEMINI_API_KEY ? "gemini" : "demo-local",
+      mode: ACTIVE_API_KEY ? AI_PROVIDER : "demo-local",
     });
   }
   if (req.method === "POST" && url.pathname === "/api/chat") {
@@ -251,9 +294,21 @@ async function handle(req, res) {
       const message = String(body.message || "").trim().slice(0, MAX_MESSAGE_LENGTH);
       if (!message) return json(res, 400, { error: "Pertanyaan masih kosong." });
       const history = Array.isArray(body.history) ? body.history : [];
-      if (GEMINI_API_KEY && AI_PROVIDER === "gemini") {
+      if (ACTIVE_API_KEY && AI_PROVIDER === "gemini") {
         try {
           return json(res, 200, await callGemini({ message, history }));
+        } catch (error) {
+          const fallback = localSearch(message);
+          return json(res, 200, {
+            ...fallback,
+            mode: "demo-local-fallback",
+            warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
+          });
+        }
+      }
+      if (ACTIVE_API_KEY && AI_PROVIDER === "groq") {
+        try {
+          return json(res, 200, await callGroq({ message, history }));
         } catch (error) {
           const fallback = localSearch(message);
           return json(res, 200, {
@@ -293,6 +348,6 @@ if (isMain) {
   http.createServer(handle).listen(PORT, HOST, () => {
     console.log(`Knowledge chatbot prototype: http://${HOST}:${PORT}`);
     console.log(`Local documents loaded: ${localDocs.length}`);
-    console.log(`AI provider: ${AI_PROVIDER} · model: ${GEMINI_MODEL} · ${GEMINI_API_KEY ? "enabled" : "demo-local mode"}`);
+    console.log(`AI provider: ${AI_PROVIDER} · model: ${ACTIVE_MODEL} · ${ACTIVE_API_KEY ? "enabled" : "demo-local mode"}`);
   });
 }
