@@ -4,7 +4,27 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(HERE, "..");
+const ROOT_CANDIDATES = [...new Set([
+  process.cwd(),
+  path.resolve(HERE, ".."),
+  HERE,
+  path.resolve(HERE, "../.."),
+  path.resolve(process.cwd(), ".."),
+])];
+
+async function findProjectRoot() {
+  for (const candidate of ROOT_CANDIDATES) {
+    try {
+      await fs.access(path.join(candidate, "knowledge-base", "00-catalog", "ingest-default.txt"));
+      return candidate;
+    } catch {
+      // Try the next layout used by local and bundled runtimes.
+    }
+  }
+  return path.resolve(HERE, "..");
+}
+
+const ROOT = await findProjectRoot();
 
 // Load local secrets when running from the repository. Hosting platforms inject
 // environment variables themselves, so existing variables always win.
