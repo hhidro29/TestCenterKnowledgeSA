@@ -56,6 +56,10 @@ const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 const GROQ_MODEL = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
 const GROQ_BASE_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GPT_API_KEY = process.env.OPENAI_API_KEY || "";
+const GPT_MODEL = process.env.GPT_MODEL || "gpt-5-mini";
+const GPT_BASE_URL = "https://api.openai.com/v1/responses";
+const GPT_ACTIVE_UNTIL = process.env.GPT_ACTIVE_UNTIL || "";
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_CONTEXT_CHARS = 24000;
 const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
@@ -63,9 +67,23 @@ const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30
 const PROFILE_LABELS = { all: "Semua knowledge base" };
 const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
 const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
+
+function getGptActivation() {
+  const activeUntil = Date.parse(GPT_ACTIVE_UNTIL);
+  const hasValidWindow = Number.isFinite(activeUntil) && activeUntil > Date.now();
+  return {
+    configured: Boolean(GPT_API_KEY),
+    active: Boolean(GPT_API_KEY) && hasValidWindow,
+    activeUntil: Number.isFinite(activeUntil) ? new Date(activeUntil).toISOString() : null,
+    remainingMs: hasValidWindow ? activeUntil - Date.now() : 0,
+    reason: !GPT_API_KEY ? "missing-api-key" : !Number.isFinite(activeUntil) ? "manual-activation-required" : hasValidWindow ? "active" : "expired",
+  };
+}
+
 const MODEL_OPTIONS = [
   { id: GROQ_MODEL, label: `Qwen · ${GROQ_MODEL}`, provider: "groq", apiKey: GROQ_API_KEY },
   { id: GEMINI_MODEL, label: `Gemini · ${GEMINI_MODEL}`, provider: "gemini", apiKey: GEMINI_API_KEY },
+  { id: GPT_MODEL, label: `GPT · ${GPT_MODEL}`, provider: "openai", apiKey: GPT_API_KEY },
 ].filter((model, index, all) => all.findIndex((item) => item.id === model.id) === index);
 const MODELS = MODEL_OPTIONS.map((model) => model.id);
 
@@ -327,6 +345,40 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
   return { mode: "groq", model, answer, sources: retrieved.sources };
 }
 
+async function callGpt({ message, history = [], model = GPT_MODEL, apiKey = GPT_API_KEY }) {
+  if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi.");
+  const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
+  const input = [
+    ...history.slice(-10).map((item) => ({
+      role: item.role === "assistant" ? "assistant" : "user",
+      content: [{ type: item.role === "assistant" ? "output_text" : "input_text", text: String(item.content || "").slice(0, MAX_MESSAGE_LENGTH) }],
+    })),
+    {
+      role: "user",
+      content: [{
+        type: "input_text",
+        text: `${message}\n\nKONTEKS KNOWLEDGE BASE:\n${retrieved.context || "Tidak ada konteks relevan yang ditemukan."}`,
+      }],
+    },
+  ];
+  const response = await fetch(GPT_BASE_URL, {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+    body: JSON.stringify({ model, instructions: buildInstructions(), input, max_output_tokens: 700 }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const detail = data?.error?.message || `OpenAI API error (${response.status})`;
+    throw new Error(detail);
+  }
+  const answer = (data.output_text || data.output?.flatMap((item) => item.content || [])
+    .filter((item) => item.type === "output_text")
+    .map((item) => item.text || "")
+    .join("\n"))?.trim();
+  if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
+  return { mode: "openai", model, answer, sources: retrieved.sources };
+}
+
 function resolveModel(requestedModel) {
   return MODEL_OPTIONS.find((model) => model.id === requestedModel) || MODEL_OPTIONS.find((model) => model.id === ACTIVE_MODEL) || MODEL_OPTIONS[0];
 }
@@ -353,7 +405,16 @@ async function handle(req, res) {
       provider: AI_PROVIDER,
       hasApiKey: Boolean(ACTIVE_API_KEY),
       defaultModel: ACTIVE_MODEL,
-      models: MODEL_OPTIONS.map(({ id, label, provider, apiKey }) => ({ id, label, provider, available: Boolean(apiKey) })),
+      models: MODEL_OPTIONS.map(({ id, label, provider, apiKey }) => ({
+        id,
+        label,
+        provider,
+        available: provider === "openai" ? Boolean(apiKey) && getGptActivation().active : Boolean(apiKey),
+        ...(provider === "openai" ? {
+          status: getGptActivation().active ? "aktif sementara" : "menunggu aktivasi manual",
+          activation: getGptActivation(),
+        } : {}),
+      })),
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
       mode: ACTIVE_API_KEY ? AI_PROVIDER : "demo-local",
@@ -394,6 +455,27 @@ async function handle(req, res) {
             warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
           });
         }
+      }
+      if (selected.apiKey && selected.provider === "openai" && getGptActivation().active) {
+        try {
+          return json(res, 200, await callGpt({ message, history, model: selected.id, apiKey: selected.apiKey }));
+        } catch (error) {
+          console.error(`[${selected.provider}/${selected.id}]`, error.message);
+          const fallback = localSearch(message);
+          return json(res, 200, {
+            ...fallback,
+            model: selected.id,
+            mode: "demo-local-fallback",
+            warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
+          });
+        }
+      }
+      if (selected.provider === "openai" && !getGptActivation().active) {
+        return json(res, 200, {
+          ...localSearch(message),
+          model: selected.id,
+          warning: "GPT sedang nonaktif dan hanya dapat digunakan setelah aktivasi manual.",
+        });
       }
       return json(res, 200, {
         ...localSearch(message),

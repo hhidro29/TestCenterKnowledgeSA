@@ -16,6 +16,8 @@ Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk j
 
 Di UI, model yang tersedia bisa dipilih per pesan. Agar keduanya aktif sekaligus, isi `GROQ_API_KEY` dan `GEMINI_API_KEY`; pilihan yang tidak memiliki key akan ditandai belum dikonfigurasi.
 
+GPT tersedia sebagai model tambahan yang sengaja nonaktif secara default. Isi `OPENAI_API_KEY` dan `GPT_MODEL`, lalu aktifkan hanya dengan mengisi `GPT_ACTIVE_UNTIL` menggunakan timestamp ISO empat jam ke depan. Setelah timestamp lewat, GPT otomatis mati dan harus diaktifkan ulang secara manual. API key tidak boleh di-commit.
+
 ## Deploy publik
 
 Repository ini juga sudah memiliki konfigurasi Vercel. Import repository di Vercel dengan **Root Directory** tetap di root repository, lalu tambahkan environment variable berikut pada **Production** dan **Preview**:
@@ -24,6 +26,9 @@ Repository ini juga sudah memiliki konfigurasi Vercel. Import repository di Verc
 AI_PROVIDER=groq
 GROQ_API_KEY=...
 GROQ_MODEL=qwen/qwen3.8-27b
+OPENAI_API_KEY=...
+GPT_MODEL=gpt-5-mini
+GPT_ACTIVE_UNTIL=
 MAX_REQUESTS_PER_MINUTE=30
 ```
 
