@@ -414,6 +414,7 @@ async function handle(req, res) {
 await loadData();
 
 export { handle };
+export default handle;
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 if (isMain) {
