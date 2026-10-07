@@ -2,6 +2,7 @@ import http from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { BUNDLED_FILES } from "./bundled-data.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_CANDIDATES = [...new Set([
@@ -25,6 +26,17 @@ async function findProjectRoot() {
 }
 
 const ROOT = await findProjectRoot();
+
+async function readProjectFile(relativePath) {
+  const fullPath = path.join(ROOT, relativePath);
+  try {
+    return await fs.readFile(fullPath, "utf8");
+  } catch (error) {
+    const bundled = BUNDLED_FILES[relativePath.split(path.sep).join("/")];
+    if (bundled !== undefined) return bundled;
+    throw error;
+  }
+}
 
 // Load local secrets when running from the repository. Hosting platforms inject
 // environment variables themselves, so existing variables always win.
@@ -62,20 +74,17 @@ let localDocs = [];
 const requestLog = new Map();
 
 async function loadData() {
-  const promptPath = path.join(ROOT, "Prompt Sistem Chatbot - Knowledge Base Terstruktur.md");
-  systemPrompt = await fs.readFile(promptPath, "utf8").catch(() =>
+  systemPrompt = await readProjectFile("Prompt Sistem Chatbot - Knowledge Base Terstruktur.md").catch(() =>
     "Jawab hanya berdasarkan knowledge base. Jangan mengarang. Sebutkan sumber dan status sumber."
   );
-  const catalogPath = path.join(ROOT, "knowledge-base", "00-catalog", "ingest-default.txt");
-  const list = await fs.readFile(catalogPath, "utf8");
+  const list = await readProjectFile(path.join("knowledge-base", "00-catalog", "ingest-default.txt"));
   const paths = list
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith("#"));
   localDocs = [];
   for (const relative of paths) {
-    const full = path.join(ROOT, "knowledge-base", relative);
-    const content = await fs.readFile(full, "utf8").catch(() => "");
+    const content = await readProjectFile(path.join("knowledge-base", relative)).catch(() => "");
     if (!content) continue;
     const front = content.match(/^---\n([\s\S]*?)\n---/);
     const metadata = {};
