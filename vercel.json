@@ -4,7 +4,7 @@
   ],
   "functions": {
     "api/[...path].mjs": {
-      "includeFiles": "knowledge-base/**",
+      "includeFiles": "knowledge-base/**/*",
       "maxDuration": 30
     }
   }
