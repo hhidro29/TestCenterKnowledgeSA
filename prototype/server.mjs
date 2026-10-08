@@ -421,6 +421,14 @@ function resolveModel(requestedModel) {
   return MODEL_OPTIONS.find((model) => model.id === requestedModel) || MODEL_OPTIONS.find((model) => model.id === ACTIVE_MODEL) || MODEL_OPTIONS[0];
 }
 
+async function callConfiguredModel(model, { message, history }) {
+  if (!model.apiKey) throw new Error(`${model.label} belum dikonfigurasi.`);
+  if (model.provider === "gemini") return callGemini({ message, history, model: model.id, apiKey: model.apiKey });
+  if (model.provider === "groq") return callGroq({ message, history, model: model.id, apiKey: model.apiKey });
+  if (model.provider === "openai") return callGpt({ message, history, model: model.id, apiKey: model.apiKey });
+  throw new Error(`Provider ${model.provider} belum didukung.`);
+}
+
 function isRateLimited(req) {
   if (!MAX_REQUESTS_PER_MINUTE || MAX_REQUESTS_PER_MINUTE < 1) return false;
   const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
@@ -448,6 +456,30 @@ async function handle(req, res) {
       localDocuments: localDocs.length,
       mode: ACTIVE_API_KEY ? AI_PROVIDER : "demo-local",
     });
+  }
+  if (req.method === "POST" && url.pathname === "/api/compare") {
+    try {
+      if (isRateLimited(req)) return json(res, 429, { error: "Batas penggunaan sementara tercapai. Coba lagi sebentar." });
+      const body = await readBody(req);
+      const message = String(body.message || "").trim().slice(0, MAX_MESSAGE_LENGTH);
+      if (!message) return json(res, 400, { error: "Pertanyaan masih kosong." });
+      const history = Array.isArray(body.history) ? body.history : [];
+      const results = await Promise.all(MODEL_OPTIONS.map(async (model) => {
+        if (!model.apiKey) {
+          return { id: model.id, label: model.label, provider: model.provider, status: "unavailable", error: `${model.label} belum dikonfigurasi.` };
+        }
+        try {
+          const result = await callConfiguredModel(model, { message, history });
+          return { id: model.id, label: model.label, provider: model.provider, status: "success", answer: result.answer };
+        } catch (error) {
+          console.error(`[compare/${model.provider}/${model.id}]`, error.message);
+          return { id: model.id, label: model.label, provider: model.provider, status: "error", error: error.message || "Model tidak tersedia." };
+        }
+      }));
+      return json(res, 200, { mode: "comparison", results });
+    } catch (error) {
+      return json(res, 500, { error: error.message || "Gagal membandingkan model." });
+    }
   }
   if (req.method === "POST" && url.pathname === "/api/chat") {
     try {

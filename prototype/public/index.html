@@ -19,6 +19,8 @@
       .presence-dot { width:7px; height:7px; border-radius:50%; background:#efad42; }
       .presence-dot.ready { background:#1ca36e; }
       .controls { display:flex; align-items:center; gap:10px; }
+      .compare-toggle { display:inline-flex; align-items:center; gap:5px; min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:#fff; font-size:11px; font-weight:800; cursor:pointer; }
+      .compare-toggle:hover, .compare-toggle.active { border-color:#aac4f8; color:var(--blue-dark); background:#f4f8ff; }
       .model-picker { display:flex; align-items:center; gap:7px; padding:4px 8px 4px 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:#f8fafc; font-size:11px; font-weight:800; }
       .model-picker select { max-width:220px; padding:5px 22px 5px 3px; border:0; outline:0; color:var(--ink); background:transparent; font-size:11px; font-weight:800; }
       .more { width:34px; height:34px; border:0; color:var(--muted); background:transparent; border-radius:50%; font-size:22px; cursor:pointer; }
@@ -43,6 +45,14 @@
       .rich-text strong { font-weight:750; }
       .msg-row.user .msg { color:#143e2d; background:#d9fdd3; border-radius:15px 15px 4px 15px; }
       .msg-row.assistant .msg { background:#fff; border-radius:15px 15px 15px 4px; }
+      .comparison-row { align-self:stretch; max-width:100%; }
+      .comparison-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+      .comparison-card { min-width:0; overflow:hidden; border:1px solid #dbe3ec; border-radius:12px; background:#fff; box-shadow:0 1px 1px rgba(35,50,70,.06); }
+      .comparison-card-head { padding:9px 10px; border-bottom:1px solid #edf0f4; color:#52617a; background:#f8fafc; font-size:11px; font-weight:800; }
+      .comparison-card-body { padding:10px 11px; color:var(--ink); font-size:13px; line-height:1.5; }
+      .comparison-card-body .rich-text p { margin-bottom:8px; }
+      .comparison-card.error .comparison-card-body, .comparison-card.unavailable .comparison-card-body { color:#8994a5; font-size:12px; }
+      .comparison-status { display:block; margin-top:4px; color:#d97706; font-size:10px; font-weight:700; }
       .msg-meta { display:flex; align-items:center; gap:7px; margin:3px 4px 0; color:#8994a5; font-size:10px; }
       .msg-row.user .msg-meta { justify-content:flex-end; }
       .tick { color:#3e80e8; font-size:12px; }
@@ -66,7 +76,7 @@
           <div class="avatar">BA</div>
           <div><div class="name">Brain Academy Assistant</div><div class="presence"><span class="presence-dot" id="statusDot"></span><span id="statusText">Memeriksa koneksi…</span></div></div>
         </div>
-        <div class="controls"><label class="model-picker"><span>Model</span><select id="model" aria-label="Pilih model"></select></label><button class="more" type="button" aria-label="Info">⋮</button></div>
+        <div class="controls"><label class="model-picker"><span>Model</span><select id="model" aria-label="Pilih model"></select></label><button class="compare-toggle" id="compareToggle" type="button" aria-pressed="false">⇄ Bandingkan</button><button class="more" type="button" aria-label="Info">⋮</button></div>
       </header>
       <section class="conversation">
         <div class="messages" id="messages">
@@ -88,7 +98,9 @@
       const statusText = document.getElementById('statusText');
       const statusDot = document.getElementById('statusDot');
       const modeNote = document.getElementById('modeNote');
+      const compareToggle = document.getElementById('compareToggle');
       const history = [];
+      let compareMode = false;
 
       function clock() { return new Intl.DateTimeFormat('id-ID', { hour:'2-digit', minute:'2-digit' }).format(new Date()); }
       function escapeHtml(value) { return String(value || '').replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -137,19 +149,35 @@
         if (kind === 'user') { const tick = document.createElement('span'); tick.className = 'tick'; tick.textContent = '✓✓'; stamp.appendChild(tick); }
         row.appendChild(stamp); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
       }
+      function addComparison(results) {
+        if (emptyEl) emptyEl.remove();
+        const row = document.createElement('div'); row.className = 'comparison-row';
+        const grid = document.createElement('div'); grid.className = 'comparison-grid';
+        (results || []).forEach((result) => {
+          const card = document.createElement('article'); card.className = `comparison-card ${result.status || 'error'}`;
+          const head = document.createElement('div'); head.className = 'comparison-card-head'; head.textContent = result.label || result.id || 'Model';
+          const body = document.createElement('div'); body.className = 'comparison-card-body';
+          if (result.status === 'success') { const rich = document.createElement('div'); rich.className = 'rich-text'; rich.appendChild(formatAssistant(result.answer || 'Tidak ada jawaban.')); body.appendChild(rich); }
+          else { body.textContent = result.error || 'Model tidak tersedia.'; const status = document.createElement('span'); status.className = 'comparison-status'; status.textContent = result.status === 'unavailable' ? 'Belum dikonfigurasi' : 'Tidak tersedia'; body.appendChild(status); }
+          card.append(head, body); grid.appendChild(card);
+        });
+        row.appendChild(grid); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
       async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); (config.models || []).forEach((model) => { const opt = document.createElement('option'); const id = typeof model === 'string' ? model : model.id; opt.value = id; opt.textContent = typeof model === 'string' ? model : model.label; opt.disabled = typeof model !== 'string' && !model.available; if (opt.disabled) opt.textContent += ' · belum dikonfigurasi'; modelEl.appendChild(opt); }); modelEl.value = config.defaultModel; const live = Boolean(config.hasApiKey && config.mode !== 'demo-local'); statusText.textContent = live ? `AI tersambung · ${config.mode}` : 'mode demo lokal'; statusDot.classList.toggle('ready', live); updateModelNote(config); return config; }
       function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · ${config?.localDocuments || 58} dokumen · knowledge base aktif`; }
       let configState = null;
-      modelEl.addEventListener('change', () => updateModelNote(configState));
+      function updateModeNote() { if (compareMode) { modeNote.textContent = 'Mode perbandingan · Qwen · Gemini · GPT'; return; } updateModelNote(configState); }
+      modelEl.addEventListener('change', () => updateModeNote());
+      compareToggle.addEventListener('click', () => { compareMode = !compareMode; compareToggle.classList.toggle('active', compareMode); compareToggle.setAttribute('aria-pressed', String(compareMode)); compareToggle.textContent = compareMode ? '⇄ Chat tunggal' : '⇄ Bandingkan'; modelEl.disabled = compareMode; updateModeNote(); });
       document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { inputEl.value = button.textContent; inputEl.focus(); }));
       inputEl.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.getElementById('composer').requestSubmit(); } });
       document.getElementById('composer').addEventListener('submit', async (event) => {
         event.preventDefault(); const message = inputEl.value.trim(); if (!message) return;
         addMessage('user', message, 'Anda'); inputEl.value = ''; sendEl.disabled = true; sendEl.textContent = '…';
-        try { const response = await fetch('/api/chat', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ message, model:modelEl.value, history }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); }
+        try { const endpoint = compareMode ? '/api/compare' : '/api/chat'; const payload = compareMode ? { message, history } : { message, model:modelEl.value, history }; const response = await fetch(endpoint, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); if (compareMode) { addComparison(data.results); history.push({ role:'user', content:message }, { role:'assistant', content:(data.results || []).map((result) => `${result.label}: ${result.answer || result.error || 'tidak tersedia'}`).join('\n') }); } else { const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); } }
         catch (error) { addMessage('assistant', `Terjadi kendala: ${error.message}`, 'Error'); } finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
       });
-      loadConfig().then((config) => { configState = config; }).catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
+      loadConfig().then((config) => { configState = config; updateModeNote(); }).catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
     </script>
   </body>
 </html>
