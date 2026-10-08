@@ -82,11 +82,11 @@
         <div class="messages" id="messages">
           <div class="welcome" id="empty">
             <div class="welcome-icon">✦</div><h1>Cari info atau siapkan rekomendasi siswa</h1>
-            <p>Asisten kerja untuk Student Advisor. Tanyakan prosedur, atau ceritakan kebutuhan siswa secara anonim untuk menyusun opsi tindak lanjut dari knowledge base.</p>
+            <p>Asisten kerja untuk Student Advisor. Tanyakan prosedur, atau ceritakan kebutuhan siswa secara anonim untuk menyusun opsi tindak lanjut.</p>
             <div class="suggestions"><button class="suggestion">Apa tahapan pendaftaran sekolah kedinasan 2026?</button><button class="suggestion">Siswa kelas 12 ingin mulai persiapan UTBK. Dukungan apa yang tersedia?</button><button class="suggestion">Apa yang perlu dikonfirmasi sebelum merekomendasikan program?</button></div>
           </div>
         </div>
-        <div class="composer-zone"><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Cari informasi atau ceritakan kebutuhan siswa…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Knowledge base · ekstraksi 6 Oktober 2026</div></div>
+        <div class="composer-zone"><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Tanyakan ke rekan SA…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Asisten Student Advisor · info diperbarui 6 Oktober 2026</div></div>
       </section>
     </div>
     <script>
@@ -164,9 +164,9 @@
         row.appendChild(grid); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
       }
       async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); (config.models || []).forEach((model) => { const opt = document.createElement('option'); const id = typeof model === 'string' ? model : model.id; opt.value = id; opt.textContent = typeof model === 'string' ? model : model.label; opt.disabled = typeof model !== 'string' && !model.available; if (opt.disabled) opt.textContent += ' · belum dikonfigurasi'; modelEl.appendChild(opt); }); modelEl.value = config.defaultModel; const live = Boolean(config.hasApiKey && config.mode !== 'demo-local'); statusText.textContent = live ? `AI tersambung · ${config.mode}` : 'mode demo lokal'; statusDot.classList.toggle('ready', live); updateModelNote(config); return config; }
-      function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · ${config?.localDocuments || 58} dokumen · knowledge base aktif`; }
+      function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · asisten SA aktif`; }
       let configState = null;
-      function updateModeNote() { if (compareMode) { modeNote.textContent = 'Mode perbandingan · Qwen · Gemini · GPT'; return; } updateModelNote(configState); }
+      function updateModeNote() { if (compareMode) { modeNote.textContent = 'Membandingkan tiga rekan model'; return; } updateModelNote(configState); }
       modelEl.addEventListener('change', () => updateModeNote());
       compareToggle.addEventListener('click', () => { compareMode = !compareMode; compareToggle.classList.toggle('active', compareMode); compareToggle.setAttribute('aria-pressed', String(compareMode)); compareToggle.textContent = compareMode ? '⇄ Chat tunggal' : '⇄ Bandingkan'; modelEl.disabled = compareMode; updateModeNote(); });
       document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { inputEl.value = button.textContent; inputEl.focus(); }));

@@ -63,7 +63,7 @@ const MAX_MESSAGE_LENGTH = 4000;
 const MAX_CONTEXT_CHARS = 24000;
 const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
 
-const PROFILE_LABELS = { all: "Semua knowledge base" };
+const PROFILE_LABELS = { all: "Semua referensi" };
 const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
 const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
 
@@ -80,7 +80,7 @@ const requestLog = new Map();
 
 async function loadData() {
   systemPrompt = await readProjectFile("Prompt Sistem Chatbot - Knowledge Base Terstruktur.md").catch(() =>
-    "Jawab hanya berdasarkan knowledge base. Jangan mengarang. Sebutkan sumber dan status sumber."
+    "Jawab sebagai rekan kerja Student Advisor berdasarkan referensi yang diberikan. Jangan mengarang."
   );
   const list = await readProjectFile(path.join("knowledge-base", "00-catalog", "ingest-default.txt"));
   const paths = list
@@ -263,7 +263,7 @@ function retrieve(query) {
   const sources = candidates.map((doc) => ({
     title: doc.title,
     path: doc.relative,
-    profile: PROFILE_LABELS[doc.metadata.profile_id] || doc.metadata.profile || "Knowledge base",
+    profile: PROFILE_LABELS[doc.metadata.profile_id] || doc.metadata.profile || "Referensi kerja",
     status: doc.metadata.source_status || "verified_extracted",
     url: doc.metadata.source_url || "",
   })).slice(0, 4);
@@ -306,22 +306,34 @@ function localSearch(query) {
     return {
       mode: "demo-local",
       model: "local-retrieval",
-      answer: "Aku belum menemukan bagian knowledge base yang cukup relevan untuk pertanyaan ini. Coba tambahkan nama topik, program, atau tahun yang lebih spesifik.",
+      answer: "Aku belum menemukan informasi yang cukup untuk memastikan hal itu. Coba tambahkan nama topik, program, instansi, atau tahun yang lebih spesifik.",
       sources: [],
     };
   }
   const answer = retrieved.selected?.length
-    ? `Model AI sedang tidak tersedia, jadi aku belum bisa mengolah sumber menjadi jawaban yang andal. Pencarian menemukan ${retrieved.sources.length} sumber kandidat, tetapi informasi tersebut perlu ditinjau ulang sebelum digunakan untuk memberi arahan kepada siswa. Coba lagi saat model tersedia atau gunakan kanal resmi untuk verifikasi.`
+    ? "Model AI sedang tidak tersedia, jadi aku belum bisa menyusun jawaban yang andal untuk kasus ini. Informasinya perlu ditinjau ulang sebelum digunakan untuk memberi arahan kepada siswa. Coba lagi saat model tersedia atau konfirmasi ke kanal resmi terkait."
     : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
   return { mode: "demo-local", model: "local-retrieval", answer, sources: retrieved.sources };
 }
 
 function buildPrompt(message, context) {
-  return `${buildInstructions()}\n\nKONTEKS KNOWLEDGE BASE:\n${context || "Tidak ada konteks relevan yang ditemukan."}\n\nPERTANYAAN USER:\n${message}`;
+  return `${buildInstructions()}\n\nREFERENSI KERJA INTERNAL:\n${context || "Tidak ada referensi relevan yang ditemukan."}\n\nPERTANYAAN STUDENT ADVISOR:\n${message}`;
+}
+
+function sanitizeAssistantAnswer(value) {
+  return String(value || "")
+    .replace(/\bBerdasarkan (?:referensi|dokumen) yang tersedia[:,]?\s*/gi, "")
+    .replace(/\bBerdasarkan informasi yang tersedia[:,]?\s*/gi, "")
+    .replace(/\bBerdasarkan data ekstraksi[^.]*\.\s*/gi, "")
+    .replace(/\bkutipan di atas\b/gi, "informasi yang ada")
+    .replace(/\b(?:data|tanggal) ekstraksi:?\s*\d{1,2}\s+\w+\s+\d{4}/gi, "informasi saat ini")
+    .replace(/\b(?:knowledge base|referensi kerja)\b/gi, "informasi yang ada")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 function buildInstructions() {
-  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Perlakukan pengguna sebagai Student Advisor yang sedang membantu siswa/orang tua; gunakan nada rekan kerja yang hangat, suportif, dan profesional.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Jika pertanyaan meminta langkah sekaligus menanyakan bagian yang belum dijelaskan, pisahkan menjadi "Yang dapat dilakukan berdasarkan sumber" dan "Yang belum dijelaskan atau belum tervalidasi".\n- Untuk rekomendasi, rangkum kebutuhan siswa secara singkat, berikan 2–3 opsi pendampingan yang didukung knowledge base, jelaskan "cocok untuk" tiap opsi, lalu ajukan satu pertanyaan paling penting untuk membantu SA memilih.\n- Jika yang diminta rekomendasi dukungan, prioritaskan konsultasi, wali asuh, Master Teacher, kelas, tryout, atau materi belajar. Jangan mengisi jawaban dengan aturan pendaftaran atau persyaratan administrasi kecuali memang diminta.\n- Jangan menjadikan rekomendasi sebagai promosi penjualan. Jangan menonjolkan harga, diskon, kuota, atau klaim pemasaran kecuali pengguna memang meminta perbandingan komersial dan datanya jelas.\n- Jangan menjanjikan hasil akademik atau kelulusan.\n- Jangan menggeneralisasi prosedur khusus satu sekolah kedinasan ke instansi lain. Gunakan prosedur spesifik hanya jika pengguna menyebut instansi tersebut; selain itu jelaskan bahwa prosedur berbeda menurut instansi.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Ringkas konteks, jangan menyalin mentah isi halaman, menu navigasi, footer, atau teks berulang.\n- Jangan menyalin metadata teknis, label status internal, atau daftar sumber panjang ke dalam jawaban.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengubah ketiadaan informasi menjadi dugaan atau saran yang terdengar seperti fakta.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
+  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Perlakukan pengguna sebagai Student Advisor yang sedang membantu siswa/orang tua; gunakan nada rekan kerja yang hangat, suportif, dan profesional.\n- Jangan menyebut "knowledge base", "referensi kerja", "konteks", "kutipan di atas", proses retrieval, atau istilah internal lain kepada pengguna kecuali mereka memang menanyakannya. Jawab seolah-olah rekan SA sedang membantu rekan SA lain.\n- Jangan memakai kata "biasanya", "umumnya", atau asumsi serupa untuk menutup kekurangan bukti. Katakan langsung jika sesuatu belum dapat dipastikan dan berikan langkah konfirmasi yang relevan.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Jika pertanyaan meminta langkah sekaligus menanyakan bagian yang belum dijelaskan, pisahkan menjadi "Yang dapat dilakukan" dan "Yang masih perlu dikonfirmasi".\n- Untuk rekomendasi, rangkum kebutuhan siswa secara singkat, berikan 2–3 opsi pendampingan yang relevan, jelaskan "cocok untuk" tiap opsi, lalu ajukan satu pertanyaan paling penting untuk membantu SA memilih.\n- Jika yang diminta rekomendasi dukungan, prioritaskan konsultasi, wali asuh, Master Teacher, kelas, tryout, atau materi belajar. Jangan mengisi jawaban dengan aturan pendaftaran atau persyaratan administrasi kecuali memang diminta.\n- Jangan menjadikan rekomendasi sebagai promosi penjualan. Jangan menonjolkan harga, diskon, kuota, atau klaim pemasaran kecuali pengguna memang meminta perbandingan komersial dan datanya jelas.\n- Jangan menjanjikan hasil akademik atau kelulusan.\n- Jangan menggeneralisasi prosedur khusus satu sekolah kedinasan ke instansi lain. Gunakan prosedur spesifik hanya jika pengguna menyebut instansi tersebut; selain itu jelaskan bahwa prosedur berbeda menurut instansi.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Ringkas referensi internal, jangan menyalin mentah isi halaman, menu navigasi, footer, atau teks berulang.\n- Jangan menyalin metadata teknis, label status internal, atau daftar sumber panjang ke dalam jawaban.\n- Gunakan hanya referensi kerja internal yang diberikan. Jika konteks tidak cukup, katakan dengan natural bahwa informasinya belum cukup dan perlu dikonfirmasi.\n- Jangan mengubah ketiadaan informasi menjadi dugaan atau saran yang terdengar seperti fakta.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
 }
 
 async function callGemini({ message, history = [], model = GEMINI_MODEL, apiKey = GEMINI_API_KEY }) {
@@ -348,11 +360,11 @@ async function callGemini({ message, history = [], model = GEMINI_MODEL, apiKey 
     const detail = data?.error?.message || `Gemini API error (${response.status})`;
     throw new Error(detail);
   }
-  const answer = (data.candidates || [])
+  const answer = sanitizeAssistantAnswer((data.candidates || [])
     .flatMap((candidate) => candidate.content?.parts || [])
     .map((part) => part.text || "")
     .join("\n")
-    .trim();
+    .trim());
   if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
   return { mode: "gemini", model, answer, sources: retrieved.sources };
 }
@@ -366,7 +378,7 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
       role: item.role === "assistant" ? "assistant" : "user",
       content: String(item.content || "").slice(0, MAX_MESSAGE_LENGTH),
     })),
-    { role: "user", content: `${message}\n\nKONTEKS KNOWLEDGE BASE:\n${retrieved.context || "Tidak ada konteks relevan yang ditemukan."}` },
+    { role: "user", content: `${message}\n\nREFERENSI KERJA INTERNAL:\n${retrieved.context || "Tidak ada referensi relevan yang ditemukan."}` },
   ];
   const response = await fetch(GROQ_BASE_URL, {
     method: "POST",
@@ -378,7 +390,7 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
     const detail = data?.error?.message || `Groq API error (${response.status})`;
     throw new Error(detail);
   }
-  const answer = data.choices?.[0]?.message?.content?.trim();
+  const answer = sanitizeAssistantAnswer(data.choices?.[0]?.message?.content?.trim());
   if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
   return { mode: "groq", model, answer, sources: retrieved.sources };
 }
@@ -395,7 +407,7 @@ async function callGpt({ message, history = [], model = GPT_MODEL, apiKey = GPT_
       role: "user",
       content: [{
         type: "input_text",
-        text: `${message}\n\nKONTEKS KNOWLEDGE BASE:\n${retrieved.context || "Tidak ada konteks relevan yang ditemukan."}`,
+        text: `${message}\n\nREFERENSI KERJA INTERNAL:\n${retrieved.context || "Tidak ada referensi relevan yang ditemukan."}`,
       }],
     },
   ];
@@ -409,7 +421,7 @@ async function callGpt({ message, history = [], model = GPT_MODEL, apiKey = GPT_
     const detail = data?.error?.message || `OpenAI API error (${response.status})`;
     throw new Error(detail);
   }
-  const answer = (data.output_text || data.output?.flatMap((item) => item.content || [])
+  const answer = sanitizeAssistantAnswer(data.output_text || data.output?.flatMap((item) => item.content || [])
     .filter((item) => item.type === "output_text")
     .map((item) => item.text || "")
     .join("\n"))?.trim();
