@@ -38,12 +38,14 @@ async function readProjectFile(relativePath) {
   }
 }
 
-// Load local secrets when running from the repository. Hosting platforms inject
-// environment variables themselves, so existing variables always win.
+// Load local secrets when running from the repository. Local `.env` wins over
+// shell exports so different projects do not accidentally share one API key;
+// hosted platform variables remain authoritative when running there.
 const localEnv = await fs.readFile(path.join(HERE, ".env"), "utf8").catch(() => "");
+const hostedRuntime = Boolean(process.env.VERCEL || process.env.RENDER || process.env.RAILWAY_ENVIRONMENT || process.env.K_SERVICE);
 for (const line of localEnv.split(/\r?\n/)) {
   const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
-  if (!match || match[1] in process.env) continue;
+  if (!match || (hostedRuntime && match[1] in process.env)) continue;
   process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, "");
 }
 
