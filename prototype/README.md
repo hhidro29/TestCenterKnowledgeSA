@@ -29,7 +29,7 @@ Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk aku
 
 Jika kedua key tersedia, dropdown di UI menampilkan Qwen dan Gemini sekaligus. Model dipilih per pesan; riwayat chat tetap dikirim agar percakapan bisa dilanjutkan saat berpindah model.
 
-GPT disiapkan sebagai model tambahan, tetapi selalu nonaktif secara default. Selain `OPENAI_API_KEY` dan `GPT_MODEL`, GPT hanya tersedia ketika `GPT_ACTIVE_UNTIL` berisi timestamp ISO yang masih berlaku. Untuk jendela uji empat jam, isi timestamp empat jam ke depan secara manual di environment Production lalu lakukan redeploy terkontrol. Setelah timestamp lewat, GPT otomatis kembali nonaktif dan tidak aktif lagi sampai `GPT_ACTIVE_UNTIL` diganti. API key tidak boleh dimasukkan ke repository.
+GPT tersedia sebagai model tambahan jika `OPENAI_API_KEY` diisi. `GPT_MODEL` dapat digunakan untuk memilih model GPT yang tersedia pada akun OpenAI. API key tidak boleh dimasukkan ke repository.
 
 ## Deploy publik dengan Render
 

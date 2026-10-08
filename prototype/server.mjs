@@ -59,7 +59,6 @@ const GROQ_BASE_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GPT_API_KEY = process.env.OPENAI_API_KEY || "";
 const GPT_MODEL = process.env.GPT_MODEL || "gpt-5-mini";
 const GPT_BASE_URL = "https://api.openai.com/v1/responses";
-const GPT_ACTIVE_UNTIL = process.env.GPT_ACTIVE_UNTIL || "";
 const MAX_MESSAGE_LENGTH = 4000;
 const MAX_CONTEXT_CHARS = 24000;
 const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
@@ -67,18 +66,6 @@ const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30
 const PROFILE_LABELS = { all: "Semua knowledge base" };
 const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
 const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
-
-function getGptActivation() {
-  const activeUntil = Date.parse(GPT_ACTIVE_UNTIL);
-  const hasValidWindow = Number.isFinite(activeUntil) && activeUntil > Date.now();
-  return {
-    configured: Boolean(GPT_API_KEY),
-    active: Boolean(GPT_API_KEY) && hasValidWindow,
-    activeUntil: Number.isFinite(activeUntil) ? new Date(activeUntil).toISOString() : null,
-    remainingMs: hasValidWindow ? activeUntil - Date.now() : 0,
-    reason: !GPT_API_KEY ? "missing-api-key" : !Number.isFinite(activeUntil) ? "manual-activation-required" : hasValidWindow ? "active" : "expired",
-  };
-}
 
 const MODEL_OPTIONS = [
   { id: GROQ_MODEL, label: `Qwen · ${GROQ_MODEL}`, provider: "groq", apiKey: GROQ_API_KEY },
@@ -405,16 +392,7 @@ async function handle(req, res) {
       provider: AI_PROVIDER,
       hasApiKey: Boolean(ACTIVE_API_KEY),
       defaultModel: ACTIVE_MODEL,
-      models: MODEL_OPTIONS.map(({ id, label, provider, apiKey }) => ({
-        id,
-        label,
-        provider,
-        available: provider === "openai" ? Boolean(apiKey) && getGptActivation().active : Boolean(apiKey),
-        ...(provider === "openai" ? {
-          status: getGptActivation().active ? "aktif sementara" : "menunggu aktivasi manual",
-          activation: getGptActivation(),
-        } : {}),
-      })),
+      models: MODEL_OPTIONS.map(({ id, label, provider, apiKey }) => ({ id, label, provider, available: Boolean(apiKey) })),
       profiles: PROFILE_LABELS,
       localDocuments: localDocs.length,
       mode: ACTIVE_API_KEY ? AI_PROVIDER : "demo-local",
@@ -456,7 +434,7 @@ async function handle(req, res) {
           });
         }
       }
-      if (selected.apiKey && selected.provider === "openai" && getGptActivation().active) {
+      if (selected.apiKey && selected.provider === "openai") {
         try {
           return json(res, 200, await callGpt({ message, history, model: selected.id, apiKey: selected.apiKey }));
         } catch (error) {
@@ -469,13 +447,6 @@ async function handle(req, res) {
             warning: "Model AI sedang tidak tersedia; jawaban sementara diambil dari retrieval lokal.",
           });
         }
-      }
-      if (selected.provider === "openai" && !getGptActivation().active) {
-        return json(res, 200, {
-          ...localSearch(message),
-          model: selected.id,
-          warning: "GPT sedang nonaktif dan hanya dapat digunakan setelah aktivasi manual.",
-        });
       }
       return json(res, 200, {
         ...localSearch(message),
