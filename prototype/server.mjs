@@ -136,6 +136,7 @@ const STOPWORDS = new Set([
   "jadi", "juga", "kami", "kamu", "karena", "ke", "kemungkinan", "ketika", "mana", "masih", "mau", "menurut",
   "menyiapkan", "perlu", "oleh", "pada", "pasti", "saja", "saya", "sebagai", "sebutkan", "sebuah", "sistem",
   "sumber", "tadi", "tentang", "terkait", "tersebut", "tidak", "untuk", "ulang", "yang", "nya", "the", "and",
+  "beberapa", "hari", "setelah", "membuat", "menyelesaikan", "langkah", "bagian", "masih", "dilakukan", "bisa",
   "what", "how", "does", "from", "based", "please", "tell", "need", "want", "should", "could", "with", "have",
 ]);
 
@@ -149,20 +150,50 @@ function isGreeting(query) {
 }
 
 function cleanExcerpt(value) {
-  return String(value || "")
+  const text = String(value || "")
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
     .replace(/<https?:\/\/[^>]+>/g, "")
+    .replace(/\b(beranda|formasi|faq|dasar hukum|buku petunjuk|buku panduan|pedoman|helpdesk|buat akun|masuk|memuat data|tentang kami|sejarah singkat|visi dan misi|koleksi buku|koleksi majalah|dokumen lain(nya)?|media sosial|facebook|twitter\s*\/\s*x|youtube|instagram)\b/gi, " ")
+    .replace(/\b\d{4}\s*©\s*[^.]+/gi, "")
     .replace(/[*_`>#]/g, "")
     .replace(/^\s*[-+•]\s+/, "")
     .replace(/\s+/g, " ")
     .trim();
+  const words = text.split(" ");
+  for (let size = Math.min(36, Math.floor(words.length / 2)); size >= 5; size -= 1) {
+    const first = words.slice(0, size).join(" ");
+    const second = words.slice(size, size * 2).join(" ");
+    if (first === second) words.splice(size, size);
+  }
+  return words.join(" ").trim();
+}
+
+function isBoilerplate(line) {
+  const value = normalize(line);
+  if (!value) return true;
+  if (value.includes("copyright") || value.includes("all rights reserved") || value.includes("total pengunjung")) return true;
+  const standaloneNavigation = new Set([
+    "beranda", "formasi", "faq", "dasar hukum", "buku petunjuk", "buku panduan", "pedoman", "helpdesk",
+    "buat akunmasuk", "memuat data", "kontak", "tautan", "media sosial", "facebooktwitter xyoutubeinstagram",
+  ]);
+  if (value.length <= 80 && standaloneNavigation.has(value)) return true;
+  const navigationWords = ["beranda", "tentang kami", "faq", "login", "buat akun", "koleksi buku", "media sosial", "memuat data"];
+  return navigationWords.filter((word) => value.includes(word)).length >= 4;
 }
 
 function makeChunks(doc) {
   const body = doc.content.replace(/^---[\s\S]*?---\s*/, "");
-  const lines = body.split(/\r?\n/).map(cleanExcerpt).filter((line) =>
-    line && !/^\|?\s*[-:|]+\s*\|?$/.test(line) && !/^sumber:/i.test(line) && !/^status:/i.test(line)
+  const normalizedTitle = normalize(doc.title);
+  const lines = body.split(/\r?\n/).filter((raw) => !isBoilerplate(raw)).map(cleanExcerpt).map((line) => {
+    let result = line;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      if (!normalize(result).startsWith(`${normalizedTitle} `)) break;
+      result = result.slice(doc.title.length).trim();
+    }
+    return result;
+  }).filter((line) =>
+    line && normalize(line) !== normalizedTitle && !isBoilerplate(line) && !/^\|?\s*[-:|]+\s*\|?$/.test(line) && !/^sumber:/i.test(line) && !/^status:/i.test(line)
   );
   const chunks = [];
   let current = [];
@@ -194,12 +225,14 @@ function retrieve(query) {
   const terms = queryTerms(query);
   if (!terms.length) return { candidates: [], context: "", sources: [] };
   const yearTerms = new Set(terms.filter((term) => /^20\d\d$/.test(term)));
-  const topicTerms = terms.filter((term) => !yearTerms.has(term));
+  const queryProfile = detectProfile(terms);
   const ranked = [];
   for (const doc of localDocs) {
     const title = normalize(doc.title);
+    const profile = doc.metadata.profile_id || doc.relative.split("/")[0];
+    const profileBoost = queryProfile ? (profile === queryProfile ? 14 : -6) : 0;
     for (const chunk of doc.chunks) {
-      let score = 0;
+      let score = profileBoost;
       let matchedTopics = 0;
       for (const term of terms) {
         const pattern = new RegExp(`\\b${term}\\b`, "g");
@@ -224,7 +257,7 @@ function retrieve(query) {
     if (count >= 2) continue;
     selected.push(candidate);
     perDoc.set(candidate.relative, count + 1);
-    if (selected.length >= 8) break;
+    if (selected.length >= 6) break;
   }
   const candidates = [...new Map(selected.map((item) => [item.relative, item])).values()];
   const sources = candidates.map((doc) => ({
@@ -239,6 +272,24 @@ function retrieve(query) {
     .join("\n\n")
     .slice(0, MAX_CONTEXT_CHARS);
   return { candidates, context, sources, selected };
+}
+
+const PROFILE_HINTS = [
+  { id: "01-kejarkedinasan", terms: ["kedinasan", "sscasn", "stan", "stis", "stmkg", "ipdn", "stin", "poltek", "kemenhub"] },
+  { id: "02-pejuang-kampus-impian", terms: ["snbp", "snbt", "snpmb", "utbk", "kampus", "ptn", "jurusan"] },
+  { id: "03-pendekar-tka", terms: ["tka", "asesmen", "tes kemampuan akademik", "pusmendik"] },
+  { id: "04-bac-12-sma", terms: ["brain academy", "bac", "master teacher", "student advisor"] },
+  { id: "05-math-champs", terms: ["math champs", "sempoa", "singapore math"] },
+  { id: "06-brain-academy-online", terms: ["brain academy online", "kelas online", "sesi tutor", "koin tutor"] },
+];
+
+function detectProfile(terms) {
+  const text = terms.join(" ");
+  const matches = PROFILE_HINTS.map((profile) => ({
+    id: profile.id,
+    score: profile.terms.reduce((total, hint) => total + (text.includes(hint) ? 1 : 0), 0),
+  })).sort((a, b) => b.score - a.score);
+  return matches[0]?.score ? matches[0].id : "";
 }
 
 function localSearch(query) {
@@ -260,7 +311,7 @@ function localSearch(query) {
     };
   }
   const answer = retrieved.selected?.length
-    ? ["Aku menemukan bagian berikut di knowledge base:", ...retrieved.selected.map((item) => `\n${item.title}\n${item.chunk}`)].join("\n")
+    ? `Model AI sedang tidak tersedia, jadi aku belum bisa mengolah sumber menjadi jawaban yang andal. Pencarian menemukan ${retrieved.sources.length} sumber kandidat; kartu sumber di bawah bisa dipakai untuk meninjaunya. Informasi tentang langkah setelah verifikasi atau pembayaran terlambat belum dapat dipastikan dari hasil pencarian ini.`
     : "Aku menemukan sumber yang cocok, tetapi belum ada potongan teks yang bisa diringkas dari dokumen tersebut.";
   return { mode: "demo-local", model: "local-retrieval", answer, sources: retrieved.sources };
 }
@@ -270,7 +321,7 @@ function buildPrompt(message, context) {
 }
 
 function buildInstructions() {
-  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
+  return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Jawab dalam Bahasa Indonesia dengan nada natural seperti rekan kerja, bukan seperti laporan otomatis.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber knowledge base.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Jika pertanyaan meminta langkah sekaligus menanyakan bagian yang belum dijelaskan, pisahkan menjadi "Yang dapat dilakukan berdasarkan sumber" dan "Yang belum dijelaskan atau belum tervalidasi".\n- Jangan menggeneralisasi prosedur khusus satu sekolah kedinasan ke instansi lain. Gunakan prosedur spesifik hanya jika pengguna menyebut instansi tersebut; selain itu jelaskan bahwa prosedur berbeda menurut instansi.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Ringkas konteks, jangan menyalin mentah isi halaman, menu navigasi, footer, atau teks berulang.\n- Kartu sumber sudah ditampilkan oleh aplikasi, jadi jangan menyalin metadata sumber panjang ke dalam jawaban. Sebutkan nama sumber secara singkat bila relevan.\n- Gunakan hanya konteks knowledge base di bawah ini. Jika konteks tidak cukup, katakan dengan bahasa natural bahwa informasinya belum ditemukan atau belum tervalidasi.\n- Jangan mengubah ketiadaan informasi menjadi dugaan atau saran yang terdengar seperti fakta.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
 }
 
 async function callGemini({ message, history = [], model = GEMINI_MODEL, apiKey = GEMINI_API_KEY }) {
