@@ -398,7 +398,7 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
   if (!apiKey) throw new Error("GROQ_API_KEY belum dikonfigurasi.");
   const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
   const messages = [
-    { role: "system", content: buildInstructions() },
+    { role: "system", content: `${buildInstructions()}\n- Untuk Qwen, jawab ringkas tetapi utuh: prioritaskan inti, maksimal 4 bagian pendek, dan jangan mengulang pertanyaan.` },
     ...history.slice(-10).map((item) => ({
       role: item.role === "assistant" ? "assistant" : "user",
       content: String(item.content || "").slice(0, MAX_MESSAGE_LENGTH),
@@ -408,7 +408,7 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
   const response = await fetch(GROQ_BASE_URL, {
     method: "POST",
     headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
-    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: Number(process.env.GROQ_MAX_OUTPUT_TOKENS || 400) }),
+    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: Number(process.env.GROQ_MAX_OUTPUT_TOKENS || 600) }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
