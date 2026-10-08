@@ -349,6 +349,18 @@ function buildInstructions() {
   return `${systemPrompt}\n\nATURAN TAMBAHAN UNTUK PROTOTYPE:\n- Perlakukan pengguna sebagai Student Advisor yang sedang membantu siswa/orang tua; gunakan nada rekan kerja yang hangat, suportif, dan profesional.\n- Jangan menyebut "knowledge base", "referensi kerja", "konteks", "kutipan di atas", proses retrieval, atau istilah internal lain kepada pengguna kecuali mereka memang menanyakannya. Jawab seolah-olah rekan SA sedang membantu rekan SA lain.\n- Jangan memakai kata "biasanya", "umumnya", atau asumsi serupa untuk menutup kekurangan bukti. Katakan langsung jika sesuatu belum dapat dipastikan dan berikan langkah konfirmasi yang relevan.\n- Untuk sapaan singkat seperti halo atau hai, balas ramah dan singkat; jangan memaksakan topik atau sumber.\n- Mulai langsung dari inti jawaban. Jangan memakai template tetap atau heading "Jawaban", "Sumber", dan "Catatan" kecuali memang membantu.\n- Jika pertanyaan meminta langkah sekaligus menanyakan bagian yang belum dijelaskan, pisahkan menjadi "Yang dapat dilakukan" dan "Yang masih perlu dikonfirmasi".\n- Untuk rekomendasi, rangkum kebutuhan siswa secara singkat, berikan 2–3 opsi pendampingan yang relevan, jelaskan "cocok untuk" tiap opsi, lalu ajukan satu pertanyaan paling penting untuk membantu SA memilih.\n- Jika yang diminta rekomendasi dukungan, prioritaskan konsultasi, wali asuh, Master Teacher, kelas, tryout, atau materi belajar. Jangan mengisi jawaban dengan aturan pendaftaran atau persyaratan administrasi kecuali memang diminta.\n- Jangan menjadikan rekomendasi sebagai promosi penjualan. Jangan menonjolkan harga, diskon, kuota, atau klaim pemasaran kecuali pengguna memang meminta perbandingan komersial dan datanya jelas.\n- Jangan menjanjikan hasil akademik atau kelulusan.\n- Jangan menggeneralisasi prosedur khusus satu sekolah kedinasan ke instansi lain. Gunakan prosedur spesifik hanya jika pengguna menyebut instansi tersebut; selain itu jelaskan bahwa prosedur berbeda menurut instansi.\n- Gunakan paragraf pendek; pakai bullet hanya untuk daftar atau langkah.\n- Ringkas referensi internal, jangan menyalin mentah isi halaman, menu navigasi, footer, atau teks berulang.\n- Jangan menyalin metadata teknis, label status internal, atau daftar sumber panjang ke dalam jawaban.\n- Gunakan hanya referensi kerja internal yang diberikan. Jika konteks tidak cukup, katakan dengan natural bahwa informasinya belum cukup dan perlu dikonfirmasi.\n- Jangan mengubah ketiadaan informasi menjadi dugaan atau saran yang terdengar seperti fakta.\n- Jangan mengarang angka, jadwal, biaya, persyaratan, atau tautan.`;
 }
 
+function formatProviderError(provider, status, data) {
+  const detail = String(data?.error?.message || `${provider} API error (${status})`);
+  const wait = detail.match(/try again in\s+([\d.]+)s/i)?.[1];
+  if (/rate limit|rate_limit_exceeded|too many requests/i.test(detail)) {
+    return `${provider} sedang mencapai batas penggunaan sementara.${wait ? ` Coba lagi sekitar ${Math.ceil(Number(wait))} detik.` : " Coba lagi sebentar."}`;
+  }
+  if (/credit|quota|billing|insufficient/i.test(detail)) {
+    return `${provider} sedang tidak dapat digunakan karena kuota atau kredit API tidak mencukupi.`;
+  }
+  return `${provider} sedang tidak tersedia. Coba lagi sebentar.`;
+}
+
 async function callGemini({ message, history = [], model = GEMINI_MODEL, apiKey = GEMINI_API_KEY }) {
   if (!apiKey) throw new Error("GEMINI_API_KEY belum dikonfigurasi.");
   const retrieved = isGreeting(message) ? { context: "", sources: [] } : retrieve(message);
@@ -396,12 +408,11 @@ async function callGroq({ message, history = [], model = GROQ_MODEL, apiKey = GR
   const response = await fetch(GROQ_BASE_URL, {
     method: "POST",
     headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
-    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: 700 }),
+    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: Number(process.env.GROQ_MAX_OUTPUT_TOKENS || 400) }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const detail = data?.error?.message || `Groq API error (${response.status})`;
-    throw new Error(detail);
+    throw new Error(formatProviderError("Qwen", response.status, data));
   }
   const answer = sanitizeAssistantAnswer(data.choices?.[0]?.message?.content?.trim());
   if (!answer) throw new Error("Model tidak mengembalikan jawaban.");
