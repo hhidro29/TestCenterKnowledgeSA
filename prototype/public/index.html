@@ -95,8 +95,11 @@
       function formatInline(value) {
         return escapeHtml(value)
           .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '$1')
-          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-          .replace(/`([^`]+)`/g, '<code>$1</code>');
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>')
+          .replace(/__([^_\n]+?)__/g, '<strong>$1</strong>')
+          .replace(/(?<!_)_([^_\n]+?)_(?!_)/g, '<em>$1</em>');
       }
       function formatAssistant(text) {
         const lines = String(text || '').replace(/\r/g, '').split('\n');
