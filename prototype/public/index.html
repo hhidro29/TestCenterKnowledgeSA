@@ -11,7 +11,7 @@
       body { margin:0; color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--chat); }
       button, select, textarea { font:inherit; }
       .app { width:100%; height:100vh; min-height:0; overflow:hidden; background:var(--white); display:flex; flex-direction:column; }
-      .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:12px 20px; border-bottom:1px solid var(--line); background:var(--white); }
+      .topbar { position:relative; height:76px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:12px 20px; border-bottom:1px solid var(--line); background:var(--white); }
       .identity { display:flex; align-items:center; gap:12px; min-width:0; }
       .avatar { width:46px; height:46px; display:grid; place-items:center; flex:0 0 auto; color:#fff; font-weight:900; letter-spacing:-.06em; border-radius:50%; background:linear-gradient(140deg,#3a7cf3,#7a6ff1); box-shadow:0 6px 14px rgba(47,111,237,.23); }
       .name { margin:0; font-size:16px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -19,10 +19,75 @@
       .presence-dot { width:7px; height:7px; border-radius:50%; background:#efad42; }
       .presence-dot.ready { background:#1ca36e; }
       .controls { display:flex; align-items:center; gap:10px; }
+      .settings-panel { position:absolute; z-index:20; top:66px; right:20px; width:min(390px, calc(100vw - 24px)); padding:12px; border:1px solid #dbe4ef; border-radius:10px; background:#fff; box-shadow:0 12px 30px rgba(44,62,88,.16); }
+      .settings-panel[hidden] { display:none; }
+      .settings-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; color:#33445c; font-size:12px; font-weight:850; }
+      .settings-close { width:26px; height:26px; border:0; border-radius:6px; color:#6c7a8f; background:#f3f6fa; cursor:pointer; }
+      .settings-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid #edf1f5; }
+      .settings-row[hidden] { display:none; }
+      .settings-row:first-of-type { border-top:0; }
+      .settings-label { flex:1; color:#617087; font-size:11px; font-weight:800; }
+      .settings-panel .model-picker { flex:1; justify-content:space-between; }
+      .settings-panel .compare-toggle { width:100%; justify-content:flex-start; }
+      .settings-action { width:100%; min-height:32px; padding:0 9px; border:1px solid #dbe4ef; border-radius:7px; color:#53627a; background:#fff; font-size:11px; font-weight:800; text-align:left; cursor:pointer; }
+      .settings-action:hover { border-color:#aac4f8; color:#245bb8; background:#f4f8ff; }
+      .settings-panel .fixture-controls { display:flex; flex-wrap:wrap; width:100%; padding:8px 0 0; }
+      .settings-panel .fixture-controls[hidden] { display:none; }
+      .settings-panel .fixture-picker { flex:1 1 160px; }
+      .settings-panel .fixture-action { flex:1 1 100%; }
       .compare-toggle { display:inline-flex; align-items:center; gap:5px; min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:#fff; font-size:11px; font-weight:800; cursor:pointer; }
       .compare-toggle:hover, .compare-toggle.active { border-color:#aac4f8; color:var(--blue-dark); background:#f4f8ff; }
       .model-picker { display:flex; align-items:center; gap:7px; padding:4px 8px 4px 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:#f8fafc; font-size:11px; font-weight:800; }
       .model-picker select { max-width:220px; padding:5px 22px 5px 3px; border:0; outline:0; color:var(--ink); background:transparent; font-size:11px; font-weight:800; }
+      .fixture-status { color:#8290a3; }
+      .fixture-controls { display:none; align-items:center; gap:8px; width:100%; padding:3px 0 2px; }
+      .fixture-picker { display:flex; align-items:center; gap:6px; min-width:0; padding:5px 8px 5px 10px; border:1px solid #dbe4ef; border-radius:9px; color:var(--muted); background:#fff; font-size:11px; font-weight:700; }
+      .fixture-picker select { min-width:150px; max-width:250px; padding:3px 22px 3px 2px; border:0; outline:0; color:var(--ink); background:transparent; font-size:11px; }
+      .fixture-action { min-height:31px; padding:0 10px; border:1px solid #c9d9f5; border-radius:8px; color:#2c5fc0; background:#f4f8ff; font-size:11px; font-weight:800; cursor:pointer; }
+      .fixture-action:disabled { opacity:.5; cursor:not-allowed; }
+      .context-strip { display:flex; align-items:center; gap:9px; min-height:38px; padding:5px 20px; border-bottom:1px solid var(--line); background:#fff; }
+      .context-strip[hidden] { display:none; }
+      .context-source { flex:0 0 auto; padding:5px 8px; border-radius:6px; color:#53627a; background:#f0f4f8; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+      .context-copy { min-width:0; display:flex; align-items:center; gap:7px; }
+      .context-title { overflow:hidden; color:var(--ink); font-size:11px; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+      .context-meta { overflow:hidden; color:var(--muted); font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+      .context-state { margin-left:auto; flex:0 0 auto; color:#9a6a13; font-size:10px; font-weight:800; }
+      .context-actions { display:flex; align-items:center; gap:4px; flex:0 0 auto; }
+      .context-action { min-height:26px; padding:0 7px; border:0; border-radius:6px; color:#64748b; background:transparent; font-size:10px; font-weight:800; cursor:pointer; }
+      .context-action:hover { color:#245bb8; background:#f2f6fc; }
+      .workflow-actions { display:flex; align-items:center; gap:10px; min-height:40px; padding:5px 20px; border-bottom:1px solid var(--line); background:#f8fbff; }
+      .workflow-action-hint { min-width:0; flex:1; overflow:hidden; color:#5c6c82; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+      .workflow-action-controls { display:flex; align-items:center; gap:7px; }
+      .workflow-action-controls select { max-width:190px; min-height:30px; padding:0 24px 0 8px; border:1px solid #d4e0f3; border-radius:7px; color:var(--ink); background:#fff; font-size:11px; }
+      .workflow-action-button { min-height:30px; padding:0 10px; border:1px solid #b9d0f6; border-radius:7px; color:#245bb8; background:#fff; font-size:11px; font-weight:800; cursor:pointer; }
+      .workflow-action-button:hover { background:#eef5ff; }
+      .workflow-action-button:disabled { opacity:.5; cursor:wait; }
+      .workflow-details-toggle { width:100%; min-height:32px; flex:0 0 auto; border:1px solid #dbe4ef; border-radius:7px; color:#617087; background:#fff; font-size:11px; font-weight:800; text-align:left; cursor:pointer; }
+      .workflow-details-toggle:hover, .workflow-details-toggle[aria-expanded="true"] { color:#245bb8; border-color:#aac4f8; background:#f4f8ff; }
+      .workflow-details-toggle[hidden] { display:none; }
+      .workflow-summary { display:none; padding:12px 20px 13px; border-bottom:1px solid var(--line); background:#fff; }
+      .workflow-summary.is-open { display:block; }
+      .workflow-summary-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+      .workflow-summary-title { min-width:0; }
+      .workflow-summary-title strong { display:block; overflow:hidden; color:var(--ink); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+      .workflow-summary-title span { display:block; margin-top:3px; color:var(--muted); font-size:11px; line-height:1.4; }
+      .workflow-step { flex:0 0 auto; padding:5px 8px; border-radius:6px; color:#245bb8; background:#eef5ff; font-size:10px; font-weight:850; text-transform:uppercase; letter-spacing:.03em; }
+      .workflow-summary-grid { display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:8px; margin-top:10px; }
+      .workflow-summary-block { min-width:0; padding:9px 10px; border:1px solid #e5ebf3; border-radius:8px; background:#fbfcfe; }
+      .workflow-summary-block h3 { margin:0 0 6px; color:#617087; font-size:10px; font-weight:850; letter-spacing:.03em; text-transform:uppercase; }
+      .workflow-summary-block p { margin:0; color:#3d4a5e; font-size:11px; line-height:1.45; }
+      .workflow-summary-block ul { margin:0; padding-left:16px; color:#3d4a5e; font-size:11px; line-height:1.45; }
+      .workflow-summary-block li + li { margin-top:3px; }
+      .workflow-summary-block.muted p { color:#8995a6; }
+      .workflow-summary-block.decision { border-color:#d9e6fb; background:#f7faff; }
+      .workflow-outcome { color:#245bb8; font-weight:850; }
+      .workflow-action-plan { margin-top:7px; padding-top:7px; border-top:1px solid #e4ecf8; }
+      .workflow-action-plan strong { color:#33445c; }
+      .pivot-recommendation { margin-top:8px; padding-top:8px; border-top:1px solid #e4ecf8; }
+      .pivot-recommendation strong { color:#33445c; }
+      .pivot-candidate { margin-top:7px; padding:7px 8px; border:1px solid #e3eaf4; border-radius:6px; background:#fff; }
+      .pivot-candidate-title { color:#245bb8; font-weight:850; }
+      .pivot-candidate p { margin-top:4px !important; }
       .more { width:34px; height:34px; border:0; color:var(--muted); background:transparent; border-radius:50%; font-size:22px; cursor:pointer; }
       .more:hover { background:#f2f5f9; }
       .conversation { flex:1; min-height:0; display:flex; flex-direction:column; background:var(--chat); }
@@ -31,9 +96,46 @@
       .welcome-icon { width:42px; height:42px; margin:0 auto 11px; display:grid; place-items:center; border-radius:14px; color:var(--blue); background:#e8efff; font-size:20px; }
       .welcome h1 { margin:0 0 8px; color:var(--ink); font-size:21px; letter-spacing:-.03em; }
       .welcome p { margin:0; color:var(--muted); line-height:1.5; font-size:13px; }
-      .suggestions { display:flex; flex-wrap:wrap; justify-content:center; gap:7px; margin-top:17px; }
-      .suggestion { border:1px solid #d7e1f3; color:#2c5fc0; background:#f8fbff; border-radius:999px; padding:8px 11px; font-size:11px; cursor:pointer; }
+      .suggestions { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:17px; }
+      .suggestion { border:1px solid #d7e1f3; color:#2c5fc0; background:#f8fbff; border-radius:9px; padding:9px 11px; font-size:11px; cursor:pointer; }
       .suggestion:hover { border-color:#aac4f8; background:#fff; }
+      .welcome .suggestions { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); text-align:left; }
+      .welcome .suggestion { min-height:62px; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+      .intent-label { color:#245bb8; font-size:11px; font-weight:850; }
+      .intent-description { color:#758399; font-size:10px; line-height:1.35; }
+      .student-brief { margin-top:18px; padding:12px 0 0; border-top:1px solid #e5ebf3; text-align:left; }
+      .student-brief-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+      .student-brief-name { color:var(--ink); font-size:14px; font-weight:850; }
+      .student-brief-meta { margin-top:3px; color:var(--muted); font-size:10px; line-height:1.4; }
+      .student-brief-status { flex:0 0 auto; padding:4px 6px; border-radius:5px; color:#1c7c58; background:#e8f7f0; font-size:9px; font-weight:850; }
+      .student-brief-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; margin-top:10px; }
+      .student-brief-item { min-width:0; color:#52617a; font-size:10px; line-height:1.4; }
+      .student-brief-item strong { display:block; margin-bottom:2px; color:#8995a6; font-size:9px; font-weight:850; text-transform:uppercase; letter-spacing:.03em; }
+      .student-brief-workflow { margin-top:10px; padding-top:9px; border-top:1px solid #edf1f5; color:#52617a; font-size:10px; line-height:1.4; }
+      .student-brief-workflow strong { color:#33445c; }
+      .context-nudge { align-self:flex-start; max-width:78%; }
+      .context-nudge .suggestions { justify-content:flex-start; margin:5px 0 0; }
+      .context-helper { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 auto 8px; padding:7px 10px; border:1px solid #dbe6f8; border-radius:8px; color:#617087; background:#f4f8ff; font-size:11px; }
+      .context-helper[hidden] { display:none; }
+      .context-helper button { flex:0 0 auto; min-height:27px; padding:0 8px; border:1px solid #b9d0f6; border-radius:6px; color:#245bb8; background:#fff; font-size:10px; font-weight:850; cursor:pointer; }
+      .draft-context { display:flex; align-items:center; gap:6px; min-height:22px; margin:0 51px 5px; color:#718096; font-size:10px; }
+      .draft-context[hidden] { display:none; }
+      .draft-context::before { content:'↳'; color:#2f6fed; font-size:12px; font-weight:850; }
+      .draft-editor { max-width:760px; margin:0 auto 8px; padding:10px 12px 11px; border:1px solid #dbe6f8; border-radius:10px; background:#fff; box-shadow:0 2px 8px rgba(45,63,86,.04); }
+      .draft-editor[hidden] { display:none; }
+      .draft-editor-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+      .draft-editor-title { color:#33445c; font-size:11px; font-weight:850; }
+      .draft-editor-hint { margin-top:2px; color:#8995a6; font-size:10px; line-height:1.35; }
+      .draft-clear { flex:0 0 auto; min-height:25px; padding:0 7px; border:0; border-radius:6px; color:#718096; background:#f4f7fa; font-size:10px; font-weight:800; cursor:pointer; }
+      .draft-clear:hover { color:#245bb8; background:#edf4ff; }
+      .draft-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+      .draft-field { min-width:0; }
+      .draft-field.full { grid-column:1 / -1; }
+      .draft-field label { display:block; margin-bottom:4px; color:#617087; font-size:10px; font-weight:850; }
+      .draft-field textarea, .draft-field input { display:block; width:100%; min-height:36px; max-height:112px; resize:vertical; padding:8px 9px; border:1px solid #e0e7f0; border-radius:7px; outline:0; color:#334155; background:#fbfcfe; font-size:11px; line-height:1.4; }
+      .draft-field textarea:focus, .draft-field input:focus { border-color:#9dbcf4; background:#fff; box-shadow:0 0 0 2px rgba(47,111,237,.08); }
+      .draft-field textarea::placeholder, .draft-field input::placeholder { color:#a2adbb; }
+      .draft-context + .draft-editor { margin-top:2px; }
       .msg-row { display:flex; flex-direction:column; max-width:78%; }
       .msg-row.user { align-self:flex-end; align-items:flex-end; }
       .msg-row.assistant { align-self:flex-start; align-items:flex-start; }
@@ -66,7 +168,9 @@
       .send:hover { background:var(--blue-dark); }
       .send:disabled { opacity:.55; cursor:wait; }
       .note { max-width:none; margin:6px 0 0; color:#9aa5b4; text-align:right; font-size:10px; }
-      @media (max-width:700px) { .topbar { padding:10px 12px; } .model-picker { padding:4px 6px; } .model-picker span { display:none; } .model-picker select { max-width:145px; } .more { display:none; } .messages { padding:14px 10px 10px; } .msg-row { max-width:89%; } .welcome { margin:auto 6px; } .composer-zone { padding:9px 7px 11px; } .icon-button { display:none; } }
+      @media (max-width:700px) { .topbar { padding:10px 12px; } .model-picker { padding:4px 6px; } .model-picker span { display:none; } .model-picker select { max-width:145px; } .fixture-picker { flex:1 1 140px; } .fixture-picker select { min-width:0; max-width:none; width:100%; } .fixture-action { flex:1 1 100%; } .settings-panel { top:60px; right:12px; } .context-strip { padding:5px 12px; } .context-state { display:none; } .workflow-summary { padding:10px 12px; } .workflow-summary-grid { grid-template-columns:1fr; } .workflow-actions { flex-wrap:wrap; padding:5px 12px; } .workflow-action-hint { flex-basis:100%; } .workflow-action-controls { width:100%; } .workflow-action-controls select { flex:1; max-width:none; } .messages { padding:14px 10px 10px; } .msg-row { max-width:89%; } .welcome { margin:auto 6px; } .composer-zone { padding:9px 7px 11px; } .icon-button { display:none; } .draft-editor { margin-left:0; margin-right:0; } .draft-fields { grid-template-columns:1fr; } .draft-field.full { grid-column:auto; } }
+      @media (max-width:700px) { .context-actions { margin-left:auto; } .student-brief-grid { grid-template-columns:1fr; } .context-helper { align-items:flex-start; } }
+      @media (max-width:420px) { .welcome .suggestions { grid-template-columns:1fr; } }
     </style>
   </head>
   <body>
@@ -76,22 +180,56 @@
           <div class="avatar">BA</div>
           <div><div class="name">Brain Academy Assistant</div><div class="presence"><span class="presence-dot" id="statusDot"></span><span id="statusText">Memeriksa koneksi…</span></div></div>
         </div>
-        <div class="controls"><label class="model-picker"><span>Model</span><select id="model" aria-label="Pilih model"></select></label><button class="compare-toggle" id="compareToggle" type="button" aria-pressed="false">⇄ Bandingkan</button><button class="more" type="button" aria-label="Info">⋮</button></div>
+        <div class="controls" id="controls"><button class="more" id="settingsToggle" type="button" aria-label="Buka pengaturan" title="Pengaturan">⋮</button></div>
       </header>
+      <aside class="settings-panel" id="settingsPanel" aria-label="Pengaturan sesi" hidden>
+        <div class="settings-head"><span>Pengaturan sesi</span><button class="settings-close" id="settingsClose" type="button" aria-label="Tutup pengaturan">×</button></div>
+        <div class="settings-row"><span class="settings-label">Model asisten</span><label class="model-picker"><select id="model" aria-label="Pilih model"></select></label></div>
+        <div class="settings-row"><button class="compare-toggle" id="compareToggle" type="button" aria-pressed="false">⇄ Bandingkan model</button></div>
+        <div class="settings-row"><button class="settings-action fixture-toggle" id="fixtureToggle" type="button" aria-expanded="false">Atur konteks Student Tower</button></div>
+        <div class="fixture-controls" id="fixtureControls" hidden>
+          <label class="fixture-picker"><span>Siswa</span><select id="fixtureStudent" aria-label="Pilih siswa simulasi"><option value="">Tanpa konteks siswa</option></select></label>
+          <label class="fixture-picker"><span>Workflow</span><select id="fixtureWorkflow" aria-label="Pilih workflow simulasi" disabled><option value="">Pilih siswa terlebih dahulu</option></select></label>
+          <label class="fixture-picker"><span>Skenario</span><select id="fixtureScenario" aria-label="Pilih skenario simulasi" disabled><option value="">Pilih siswa terlebih dahulu</option></select></label>
+          <button class="fixture-action" id="useScenario" type="button" disabled>Gunakan pembuka</button>
+        </div>
+        <div class="settings-row"><button class="workflow-details-toggle" id="workflowDetailsToggle" type="button" aria-label="Tampilkan detail workflow" title="Tampilkan detail workflow" aria-expanded="false" hidden>Lihat detail workflow</button></div>
+      </aside>
+      <section class="context-strip" aria-label="Konteks percakapan">
+        <span class="context-source" id="contextSource">Student Tower</span>
+        <div class="context-copy"><strong class="context-title" id="contextTitle"></strong><span class="context-meta" id="contextMeta"></span></div>
+        <span class="context-state" id="contextState">Belum dimulai</span>
+        <div class="context-actions"><button class="context-action" id="changeContext" type="button">Ganti</button><button class="context-action" id="clearContext" type="button">Lepas</button></div>
+      </section>
+      <section class="workflow-actions" id="workflowActions" aria-label="Tindakan workflow" hidden>
+        <span class="workflow-action-hint" id="workflowActionHint"></span>
+        <div class="workflow-action-controls" id="workflowActionControls"></div>
+      </section>
+      <section class="workflow-summary" id="workflowSummary" aria-label="Ringkasan workflow">
+        <div class="workflow-summary-head">
+          <div class="workflow-summary-title"><strong id="workflowSummaryTitle"></strong><span id="workflowSummaryObjective"></span></div>
+          <span class="workflow-step" id="workflowSummaryStep"></span>
+        </div>
+        <div class="workflow-summary-grid">
+          <div class="workflow-summary-block" id="workflowFocusBlock"><h3>Yang perlu digali</h3><ul id="workflowFocus"></ul></div>
+          <div class="workflow-summary-block" id="workflowMissingBlock"><h3>Belum diketahui</h3><ul id="workflowMissing"></ul></div>
+          <div class="workflow-summary-block decision" id="workflowDecisionBlock"><h3>Output konsultasi</h3><p id="workflowDecisionText"></p><div class="workflow-action-plan" id="workflowActionPlan" hidden></div></div>
+        </div>
+      </section>
       <section class="conversation">
         <div class="messages" id="messages">
           <div class="welcome" id="empty">
-            <div class="welcome-icon">✦</div><h1>Cari info atau siapkan rekomendasi siswa</h1>
-            <p>Asisten kerja untuk Student Advisor. Tanyakan prosedur, atau ceritakan kebutuhan siswa secara anonim untuk menyusun opsi tindak lanjut.</p>
-            <div class="suggestions"><button class="suggestion">Apa tahapan pendaftaran sekolah kedinasan 2026?</button><button class="suggestion">Siswa kelas 12 ingin mulai persiapan UTBK. Dukungan apa yang tersedia?</button><button class="suggestion">Apa yang perlu dikonfirmasi sebelum merekomendasikan program?</button></div>
+            <div class="welcome-icon">✦</div><h1>Apa yang ingin kamu bantu hari ini?</h1>
+            <p>Pilih tujuan awal, lalu tulis detailnya dengan bahasamu sendiri.</p>
+            <div class="suggestions"><button class="suggestion" data-intent="understand"><span class="intent-label">Pahami kondisi siswa</span><span class="intent-description">Ringkas sinyal penting dan risiko utama</span></button><button class="suggestion" data-intent="action"><span class="intent-label">Tentukan tindakan berikutnya</span><span class="intent-description">Terjemahkan workflow menjadi langkah SA</span></button><button class="suggestion" data-intent="consultation"><span class="intent-label">Siapkan konsultasi</span><span class="intent-description">Susun fokus dan pertanyaan prioritas</span></button><button class="suggestion" data-intent="note"><span class="intent-label">Catat hasil konsultasi</span><span class="intent-description">Rapikan catatan raw menjadi insight</span></button></div>
           </div>
         </div>
-        <div class="composer-zone"><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Tanyakan ke rekan SA…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Asisten Student Advisor · info diperbarui 6 Oktober 2026</div></div>
+        <div class="composer-zone"><div class="context-helper" id="contextHelper" hidden><span>Gunakan data siswa untuk membuat analisis yang lebih spesifik.</span><button id="connectStudent" type="button">Hubungkan siswa</button></div><div class="draft-context" id="draftContext" hidden></div><section class="draft-editor" id="draftEditor" aria-label="Draft permintaan" hidden><div class="draft-editor-head"><div><div class="draft-editor-title">Draft permintaan</div><div class="draft-editor-hint">Edit bagian yang perlu disesuaikan sebelum dikirim.</div></div><button class="draft-clear" id="clearDraft" type="button">Hapus draft</button></div><div class="draft-fields"><div class="draft-field full"><label for="draftGoal">Tujuan</label><input id="draftGoal" type="text" /></div><div class="draft-field"><label for="draftFocus">Yang perlu dianalisis</label><textarea id="draftFocus" rows="3"></textarea></div><div class="draft-field"><label for="draftOutput">Output yang diharapkan</label><textarea id="draftOutput" rows="3"></textarea></div><div class="draft-field full"><label for="draftNotes">Catatan tambahan <span>(opsional)</span></label><textarea id="draftNotes" rows="2" placeholder="Tambahkan fokus, batasan, atau pertanyaan khusus…"></textarea></div></div></section><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Tanyakan ke rekan SA…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Asisten Student Advisor · info diperbarui 6 Oktober 2026</div></div>
       </section>
     </div>
     <script>
       const messagesEl = document.getElementById('messages');
-      const emptyEl = document.getElementById('empty');
+      let emptyEl = document.getElementById('empty');
       const inputEl = document.getElementById('input');
       const sendEl = document.getElementById('send');
       const modelEl = document.getElementById('model');
@@ -99,8 +237,64 @@
       const statusDot = document.getElementById('statusDot');
       const modeNote = document.getElementById('modeNote');
       const compareToggle = document.getElementById('compareToggle');
+      const controlsEl = document.getElementById('controls');
+      const settingsToggleEl = document.getElementById('settingsToggle');
+      const settingsPanelEl = document.getElementById('settingsPanel');
+      const settingsCloseEl = document.getElementById('settingsClose');
+      const fixtureStudentEl = document.getElementById('fixtureStudent');
+      const fixtureWorkflowEl = document.getElementById('fixtureWorkflow');
+      const fixtureScenarioEl = document.getElementById('fixtureScenario');
+      const useScenarioEl = document.getElementById('useScenario');
+      const fixtureToggleEl = document.getElementById('fixtureToggle');
+      const fixtureControlsEl = document.getElementById('fixtureControls');
+      const contextSourceEl = document.getElementById('contextSource');
+      const contextTitleEl = document.getElementById('contextTitle');
+      const contextMetaEl = document.getElementById('contextMeta');
+      const contextStateEl = document.getElementById('contextState');
+      const contextStripEl = document.querySelector('.context-strip');
+      const changeContextEl = document.getElementById('changeContext');
+      const clearContextEl = document.getElementById('clearContext');
+      const contextHelperEl = document.getElementById('contextHelper');
+      const connectStudentEl = document.getElementById('connectStudent');
+      const draftContextEl = document.getElementById('draftContext');
+      const draftEditorEl = document.getElementById('draftEditor');
+      const clearDraftEl = document.getElementById('clearDraft');
+      const draftGoalEl = document.getElementById('draftGoal');
+      const draftFocusEl = document.getElementById('draftFocus');
+      const draftOutputEl = document.getElementById('draftOutput');
+      const draftNotesEl = document.getElementById('draftNotes');
+      const workflowDetailsToggleEl = document.getElementById('workflowDetailsToggle');
+      const workflowDetailsRowEl = workflowDetailsToggleEl.parentElement;
+      const workflowActionsEl = document.getElementById('workflowActions');
+      const workflowActionHintEl = document.getElementById('workflowActionHint');
+      const workflowActionControlsEl = document.getElementById('workflowActionControls');
+      const workflowSummaryEl = document.getElementById('workflowSummary');
+      const workflowSummaryTitleEl = document.getElementById('workflowSummaryTitle');
+      const workflowSummaryObjectiveEl = document.getElementById('workflowSummaryObjective');
+      const workflowSummaryStepEl = document.getElementById('workflowSummaryStep');
+      const workflowFocusEl = document.getElementById('workflowFocus');
+      const workflowMissingEl = document.getElementById('workflowMissing');
+      const workflowDecisionTextEl = document.getElementById('workflowDecisionText');
+      const workflowActionPlanEl = document.getElementById('workflowActionPlan');
       const history = [];
+      const workflowSessionId = globalThis.crypto?.randomUUID?.() || `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
       let compareMode = false;
+      let fixtureState = null;
+      let fixtureScenarios = [];
+      let workflowState = null;
+      let lastUserMessage = '';
+      let lastAssistantAnswer = '';
+      let insightReady = false;
+      let structuredDraft = null;
+
+      const intentCatalog = {
+        understand: { label: 'Pahami kondisi siswa', detail: 'Ringkas sinyal penting dan risiko utama' },
+        progress: { label: 'Lihat progress TO', detail: 'Bandingkan nilai, tren, dan target' },
+        risk: { label: 'Evaluasi risiko pilihan', detail: 'Lihat risiko terhadap target pilihan' },
+        action: { label: 'Tentukan tindakan berikutnya', detail: 'Terjemahkan workflow menjadi langkah SA' },
+        consultation: { label: 'Siapkan konsultasi', detail: 'Susun fokus dan pertanyaan prioritas' },
+        note: { label: 'Catat hasil konsultasi', detail: 'Rapikan catatan raw menjadi insight' },
+      };
 
       function clock() { return new Intl.DateTimeFormat('id-ID', { hour:'2-digit', minute:'2-digit' }).format(new Date()); }
       function escapeHtml(value) { return String(value || '').replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -163,21 +357,432 @@
         });
         row.appendChild(grid); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
       }
+      function addConnectContextNudge(message) {
+        if (fixtureState || !/(siswa|kasus|workflow|nilai|pilihan ptn|pilihan prodi|rekomendasi)/i.test(message)) return;
+        addMessage('assistant', 'Aku bisa memberi arahan yang lebih tepat kalau data siswanya terhubung. Kamu juga bisa lanjut dengan panduan umum tanpa menghubungkan data.', 'Brain Academy Assistant');
+        const row = document.createElement('div');
+        row.className = 'suggestions context-nudge';
+        const button = document.createElement('button');
+        button.className = 'suggestion';
+        button.type = 'button';
+        button.textContent = 'Hubungkan data siswa';
+        button.addEventListener('click', openStudentPicker);
+        row.appendChild(button);
+        messagesEl.appendChild(row);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+      function getActiveWorkflow() { return fixtureState?.active_workflows?.find((workflow) => workflow.status !== 'COMPLETED') || fixtureState?.active_workflows?.[0] || null; }
+      function getStudentName(student = fixtureState) { return student?.student_name || student?.name || student?.student_id || 'siswa ini'; }
+      function getPrimaryChoice(student = fixtureState) { return (student?.choices || []).find((choice) => Number(choice.priority) === 1) || student?.choices?.[0] || null; }
+      function getProgressSummary(student = fixtureState) {
+        const choice = getPrimaryChoice(student);
+        const simulation = choice?.simulation || {};
+        if (simulation.latest_score == null) return 'Nilai TO belum tersedia';
+        const trend = { up: 'naik', stable: 'stabil', down: 'turun' }[simulation.score_trend] || 'belum terbaca';
+        const target = simulation.target_score != null ? ` · target ${simulation.target_score}` : '';
+        return `${simulation.latest_score}${target} · tren ${trend}`;
+      }
+      function getRiskSummary(student = fixtureState) {
+        const risks = student?.profiling?.learning_risks || [];
+        const choice = getPrimaryChoice(student);
+        const simulation = choice?.simulation || {};
+        const summary = [];
+        if (simulation.latest_score != null && simulation.target_score != null && simulation.latest_score < simulation.target_score) summary.push(`gap ${simulation.target_score - simulation.latest_score} poin dari target`);
+        summary.push(...risks.slice(0, 2).map((risk) => String(risk).replace(/\b\w/g, (char) => char.toUpperCase())));
+        if (student?.profiling?.interest_status === 'still_exploring') summary.push('minat prodi masih dieksplorasi');
+        if (student?.parent_context?.support_status === 'not_aligned_with_student_preference') summary.push('preferensi siswa dan orang tua belum selaras');
+        return summary.length ? summary.join('; ') : 'Belum ada risiko utama yang tercatat';
+      }
+      function formatChoice(choice) {
+        if (!choice) return 'Pilihan PTN/prodi belum tersedia';
+        return `${choice.university || 'PTN belum diisi'} · ${choice.program || 'prodi belum diisi'}`;
+      }
+      function intentChipMarkup(intentId) {
+        const intent = intentCatalog[intentId];
+        if (!intent) return '';
+        return `<button class="suggestion intent-chip" type="button" data-intent="${escapeHtml(intentId)}"><span class="intent-label">${escapeHtml(intent.label)}</span><span class="intent-description">${escapeHtml(intent.detail)}</span></button>`;
+      }
+      function contextBriefMarkup(student, workflow) {
+        const choices = (student?.choices || []).slice(0, 2).map((choice) => `<div>${escapeHtml(formatChoice(choice))}</div>`).join('') || '<div>Pilihan PTN/prodi belum tersedia</div>';
+        return `<div class="student-brief"><div class="student-brief-head"><div><div class="student-brief-name">${escapeHtml(getStudentName(student))}</div><div class="student-brief-meta">${escapeHtml(student?.admission_route || 'Jalur belum diisi')} · ${escapeHtml(student?.checkpoint || 'Checkpoint belum diisi')}</div></div><span class="student-brief-status">Siswa aktif</span></div><div class="student-brief-grid"><div class="student-brief-item"><strong>Pilihan</strong>${choices}</div><div class="student-brief-item"><strong>Progress TO</strong>${escapeHtml(getProgressSummary(student))}</div><div class="student-brief-item"><strong>Risiko utama</strong>${escapeHtml(getRiskSummary(student))}</div><div class="student-brief-item"><strong>Status workflow</strong>${escapeHtml(workflowStatusLabels[workflow?.status] || 'Belum ada workflow')}</div></div>${workflow ? `<div class="student-brief-workflow"><strong>${escapeHtml(workflow.title || 'Workflow aktif')}</strong><br>${escapeHtml(workflow.next_action || workflow.objective || 'Tinjau kondisi siswa dan tentukan langkah berikutnya.')}</div>` : ''}</div>`;
+      }
+      function openStudentPicker() {
+        setSettingsOpen(true);
+        setFixtureDrawerOpen(true);
+        fixtureStudentEl.focus();
+      }
+      function syncContextUrl(studentId = '', workflowId = '') {
+        const url = new URL(window.location.href);
+        if (studentId) { url.searchParams.set('studentId', studentId); url.searchParams.set('source', 'student-tower'); } else { url.searchParams.delete('studentId'); url.searchParams.delete('source'); }
+        if (workflowId) url.searchParams.set('workflowId', workflowId); else url.searchParams.delete('workflowId');
+        window.history.replaceState({}, '', url);
+      }
+      function buildPromptDraft(intentId) {
+        const student = fixtureState;
+        const name = getStudentName(student);
+        const drafts = {
+          understand: { goal: `Pahami kondisi ${student ? name : 'siswa ini'}`, focus: 'Sinyal penting, risiko utama, dan informasi yang masih perlu dikonfirmasi.', output: 'Ringkasan kondisi; risiko utama; pertanyaan klarifikasi; tindakan SA berikutnya.' },
+          progress: { goal: `Evaluasi progress TO ${student ? name : 'siswa ini'}`, focus: 'Nilai terakhir, tren, target, perubahan checkpoint, dan risiko terhadap target.', output: 'Kondisi saat ini; gap ke target; perubahan dari checkpoint sebelumnya; risiko; tindakan SA berikutnya.' },
+          risk: { goal: `Evaluasi risiko pilihan ${student ? name : 'siswa ini'}`, focus: 'Nilai, tren TO, minat siswa, pertimbangan orang tua, kemampuan, dan kualitas data.', output: 'Risiko utama; faktor yang mendukung; informasi yang belum cukup; opsi tindakan yang bisa dipertimbangkan.' },
+          action: { goal: `Tentukan tindakan berikutnya untuk ${student ? name : 'kasus siswa ini'}`, focus: 'Workflow aktif, pemicu tindakan, informasi yang masih kurang, dan pihak yang perlu dilibatkan.', output: 'Satu langkah SA paling relevan; pertanyaan/data yang perlu dikumpulkan; kriteria selesai; tindak lanjut.' },
+          consultation: { goal: `Siapkan konsultasi ${student ? `untuk ${name}` : 'siswa ini'}`, focus: 'Tujuan sesi, prioritas siswa, posisi orang tua, kemampuan belajar, dan ruang kompromi.', output: 'Fokus pembicaraan; pertanyaan prioritas; informasi yang perlu dicatat; outcome yang perlu dikonfirmasi.' },
+          note: { goal: `Rapikan hasil konsultasi ${student ? `dengan ${name}` : 'dengan siswa ini'}`, focus: 'Catatan raw konsultasi yang akan ditempel di bagian Catatan tambahan.', output: 'Fakta yang disebutkan; posisi siswa; posisi orang tua; kemampuan; risiko; kesepakatan; informasi yang belum diketahui.' },
+        };
+        return drafts[intentId] || drafts.action;
+      }
+      function getDraftValues() {
+        return { goal: draftGoalEl.value.trim(), focus: draftFocusEl.value.trim(), output: draftOutputEl.value.trim(), notes: draftNotesEl.value.trim() };
+      }
+      function composeStructuredPrompt() {
+        const draft = getDraftValues();
+        const sections = [`Tujuan: ${draft.goal}`, `Yang perlu dianalisis:\n${draft.focus}`, `Output yang diharapkan:\n${draft.output}`];
+        if (draft.notes) sections.push(`Catatan tambahan:\n${draft.notes}`);
+        return sections.filter(Boolean).join('\n\n');
+      }
+      function clearStructuredDraft(focusInput = false) {
+        structuredDraft = null;
+        draftEditorEl.hidden = true;
+        draftContextEl.hidden = true;
+        draftGoalEl.value = '';
+        draftFocusEl.value = '';
+        draftOutputEl.value = '';
+        draftNotesEl.value = '';
+        inputEl.placeholder = 'Tanyakan ke rekan SA…';
+        if (focusInput) inputEl.focus();
+      }
+      function renderStructuredDraft(draft) {
+        structuredDraft = draft;
+        draftGoalEl.value = draft.goal || '';
+        draftFocusEl.value = draft.focus || '';
+        draftOutputEl.value = draft.output || '';
+        draftNotesEl.value = draft.notes || '';
+        draftEditorEl.hidden = false;
+        inputEl.placeholder = 'Tambahkan instruksi bebas (opsional)…';
+      }
+      function setDraftFromIntent(intentId) {
+        inputEl.value = '';
+        renderStructuredDraft({ intentId, ...buildPromptDraft(intentId) });
+        const needsStudent = ['understand', 'progress', 'risk', 'action', 'consultation'].includes(intentId);
+        contextHelperEl.hidden = Boolean(fixtureState) || !needsStudent;
+        draftContextEl.textContent = fixtureState ? `Konteks digunakan: ${getStudentName()} · ${fixtureState.checkpoint || 'checkpoint aktif'} · ${getProgressSummary()}` : '';
+        draftContextEl.hidden = !fixtureState;
+        draftGoalEl.focus();
+      }
+      function renderIntentChips(container, workflow = null) {
+        container.innerHTML = (workflow ? ['understand', 'progress', 'risk', 'action', 'consultation', 'note'] : ['understand', 'action', 'consultation', 'note']).map(intentChipMarkup).join('');
+        bindSuggestionHandlers(container);
+      }
+      function updateContextStrip() {
+        const workflow = workflowState || getActiveWorkflow();
+        if (!fixtureState) {
+          contextStripEl.hidden = true;
+          contextHelperEl.hidden = true;
+          workflowDetailsToggleEl.hidden = true;
+          workflowDetailsRowEl.hidden = true;
+          return;
+        }
+        contextStripEl.hidden = false;
+        contextSourceEl.textContent = 'Student Tower';
+        contextTitleEl.textContent = fixtureState.student_name || fixtureState.student_id;
+        contextMetaEl.textContent = `${fixtureState.checkpoint} · ${workflow?.title || fixtureState.admission_route}`;
+        contextStateEl.textContent = workflow ? `Membahas siswa · ${workflowStatusLabels[workflow.status] || 'aktif'}` : 'Membahas siswa';
+        changeContextEl.hidden = false;
+        clearContextEl.hidden = false;
+        workflowDetailsToggleEl.hidden = !workflow;
+        workflowDetailsRowEl.hidden = !workflow;
+      }
+      function resetFixturePickers() {
+        fixtureStudentEl.value = '';
+        fixtureWorkflowEl.innerHTML = '<option value="">Pilih siswa terlebih dahulu</option>';
+        fixtureWorkflowEl.disabled = true;
+        clearScenarioPicker();
+      }
+      function clearStudentContext() {
+        fixtureState = null;
+        workflowState = null;
+        syncContextUrl();
+        resetFixturePickers();
+        setFixtureDrawerOpen(false);
+        setSettingsOpen(false);
+        resetConversation();
+        workflowActionsEl.hidden = true;
+        workflowActionControlsEl.replaceChildren();
+        updateModeNote();
+      }
+      function workflowActionButton(label, action, value = '') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'workflow-action-button';
+        button.textContent = label;
+        button.dataset.workflowAction = action;
+        if (value) button.dataset.workflowValue = value;
+        return button;
+      }
+      function setFixtureDrawerOpen(open) {
+        fixtureControlsEl.hidden = !open;
+        fixtureToggleEl.setAttribute('aria-expanded', String(open));
+        fixtureToggleEl.textContent = open ? 'Tutup' : 'Atur konteks Student Tower';
+      }
+      const workflowStatusLabels = {
+        NEEDS_ACTION: 'Perlu tindakan',
+        CONSULTATION_PREP: 'Persiapan konsultasi',
+        CONSULTATION_IN_PROGRESS: 'Konsultasi berlangsung',
+        STRUCTURING_INSIGHT: 'Review ringkasan',
+        DRAFT_DECISION: 'Susun draft keputusan',
+        WAITING_FOR_SA_CONFIRMATION: 'Menunggu konfirmasi SA',
+        WAITING_FOR_CLARIFICATION: 'Menunggu informasi',
+        WORKFLOW_UPDATED: 'Tindak lanjut siap',
+        COMPLETED: 'Selesai',
+      };
+      const workflowUpdateMessages = {
+        CONSULTATION_PREP: 'Persiapan konsultasi sudah siap. Tinjau fokus pertanyaan sebelum menghubungi siswa dan orang tua.',
+        CONSULTATION_IN_PROGRESS: 'Konsultasi siap dimulai. Catat hasil percakapan setelah sesi selesai.',
+        STRUCTURING_INSIGHT: 'Catatan tersimpan. Ringkasan hasil konsultasi siap ditinjau.',
+        DRAFT_DECISION: 'Ringkasan sudah dikonfirmasi. Pilih hasil konsultasi yang paling sesuai.',
+        WAITING_FOR_SA_CONFIRMATION: 'Draft keputusan siap ditinjau. Konfirmasi jika sudah sesuai dengan hasil konsultasi.',
+        WAITING_FOR_CLARIFICATION: 'Keputusan ditunda. Lengkapi informasi yang masih dibutuhkan sebelum memilih outcome.',
+        WORKFLOW_UPDATED: 'Tindak lanjut sudah disiapkan. Pastikan rencana ini dipahami oleh siswa dan orang tua.',
+        COMPLETED: 'Workflow selesai. Tidak ada tindakan lanjutan untuk saat ini.',
+      };
+      const outcomeLabels = { CONTINUE: 'Lanjut', CONTINUE_WITH_RISK: 'Lanjut dengan Risk', PIVOT: 'Pivot', WAITING_FOR_CLARIFICATION: 'Tunda keputusan' };
+      function renderList(element, items, emptyText) {
+        element.replaceChildren();
+        const values = (items || []).filter(Boolean);
+        if (!values.length) { const li = document.createElement('li'); li.textContent = emptyText; element.appendChild(li); return; }
+        values.forEach((item) => { const li = document.createElement('li'); li.textContent = item; element.appendChild(li); });
+      }
+      function renderWorkflowSummary() {
+        if (!workflowState || !fixtureState) { workflowSummaryEl.classList.remove('is-open'); workflowDetailsToggleEl.hidden = true; workflowDetailsRowEl.hidden = true; return; }
+        workflowSummaryTitleEl.textContent = workflowState.title || 'Workflow aktif';
+        workflowSummaryObjectiveEl.textContent = workflowState.objective || 'Tujuan workflow belum diisi.';
+        workflowSummaryStepEl.textContent = workflowStatusLabels[workflowState.status] || workflowState.status || 'Workflow aktif';
+        renderList(workflowFocusEl, workflowState.consultation_focus, 'Belum ada fokus konsultasi yang ditentukan.');
+        renderList(workflowMissingEl, workflowState.missing_information, 'Informasi minimum sudah tersedia.');
+        const decision = workflowState.decision || workflowState.draft_decision;
+        if (decision?.outcome) {
+          const prefix = decision.status === 'CONFIRMED' ? 'Terkonfirmasi' : 'Draft, belum final';
+          workflowDecisionTextEl.innerHTML = `${escapeHtml(prefix)}: <span class="workflow-outcome">${escapeHtml(outcomeLabels[decision.outcome] || decision.outcome)}</span>`;
+        } else if (workflowState.status === 'STRUCTURING_INSIGHT' && workflowState.confirmed_insight) {
+          workflowDecisionTextEl.textContent = 'Ringkasan sudah dikonfirmasi; keputusan belum dipilih.';
+        } else {
+          workflowDecisionTextEl.textContent = 'Belum ada keputusan. Gunakan chat untuk meninjau fakta dan pilih outcome.';
+        }
+        if (workflowState.action_plan) {
+          const plan = workflowState.action_plan;
+          const recommendation = plan.recommendation;
+          const candidateMarkup = (recommendation?.candidates || []).map((candidate) => `<div class="pivot-candidate"><div class="pivot-candidate-title">${escapeHtml(candidate.program)} · ${escapeHtml(candidate.university)}</div><p>Minat siswa: ${escapeHtml(candidate.student_fit)}</p><p>Keluarga: ${escapeHtml(candidate.parent_fit)}</p><p>Kemampuan: ${escapeHtml(candidate.ability_fit)} Kualitas data: ${escapeHtml(candidate.data_quality)}.</p><p>${escapeHtml(candidate.next_validation)}</p></div>`).join('');
+          const recommendationMarkup = recommendation ? `<div class="pivot-recommendation"><strong>Rekomendasi irisan · ${recommendation.status === 'NEEDS_SA_REVIEW' ? 'perlu review SA' : 'data belum cukup'}</strong><p>${escapeHtml(recommendation.principle)}</p>${candidateMarkup || '<p>Belum ada kandidat alternatif pada data simulasi.</p>'}</div>` : '';
+          workflowActionPlanEl.hidden = false;
+          workflowActionPlanEl.innerHTML = `<strong>Action plan:</strong> ${escapeHtml(plan.action || '')}<br><strong>Owner:</strong> ${escapeHtml(plan.owner || '')}<br><strong>Evaluasi:</strong> ${escapeHtml(plan.review || '')}${recommendationMarkup}`;
+        } else { workflowActionPlanEl.hidden = true; workflowActionPlanEl.replaceChildren(); }
+      }
+      function workflowAnalysisText(workflow) {
+        if (!workflow) return '';
+        const trigger = workflow.trigger ? `Pemicu: ${workflow.trigger}` : '';
+        const focus = (workflow.consultation_focus || []).slice(0, 2).join('; ');
+        const decision = (workflow.allowed_outcomes || []).map((outcome) => ({ CONTINUE: 'Lanjut', CONTINUE_WITH_RISK: 'Lanjut dengan Risk', PIVOT: 'Pivot', WAITING_FOR_CLARIFICATION: 'Tunda keputusan' }[outcome] || outcome)).join(', ');
+        if (workflow.status === 'COMPLETED') return 'Workflow ini sudah selesai dan tidak memiliki tindakan lanjutan untuk saat ini.';
+        return `Ada satu hal yang perlu ditindaklanjuti: ${trigger || 'fakta dan prioritas siswa masih perlu dikonfirmasi.'}\n\nLangkah berikutnya: ${workflow.next_action || 'konfirmasi fakta dan prioritas siswa.'}${focus ? ` Fokus konsultasinya adalah ${focus}.` : ''}${decision ? ` Setelah itu, kita dapat menilai ${decision}.` : ''}`;
+      }
+      function renderWorkflowActions() {
+        if (!workflowState || !fixtureState) { workflowActionsEl.hidden = true; workflowActionControlsEl.replaceChildren(); return; }
+        workflowActionsEl.hidden = false;
+        workflowActionHintEl.textContent = workflowState.next_action || `Workflow ${workflowState.status}`;
+        workflowActionControlsEl.replaceChildren();
+        if (workflowState.status === 'NEEDS_ACTION') workflowActionControlsEl.appendChild(workflowActionButton('Siapkan konsultasi', 'prepare_consultation'));
+        if (workflowState.status === 'CONSULTATION_PREP') workflowActionControlsEl.appendChild(workflowActionButton('Mulai konsultasi', 'start_consultation'));
+        if (workflowState.status === 'CONSULTATION_IN_PROGRESS') {
+          const button = workflowActionButton('Simpan pesan terakhir sebagai catatan', 'save_raw_note');
+          button.disabled = !lastUserMessage;
+          workflowActionControlsEl.appendChild(button);
+        }
+        if (workflowState.status === 'STRUCTURING_INSIGHT') { const button = workflowActionButton('Konfirmasi ringkasan', 'confirm_insight'); button.disabled = !insightReady; workflowActionControlsEl.appendChild(button); }
+        if (workflowState.status === 'DRAFT_DECISION') {
+          const select = document.createElement('select');
+          select.id = 'workflowOutcome';
+          select.setAttribute('aria-label', 'Pilih draft outcome');
+          const labels = { CONTINUE: 'Lanjut', CONTINUE_WITH_RISK: 'Lanjut dengan Risk', PIVOT: 'Pivot', WAITING_FOR_CLARIFICATION: 'Tunda keputusan' };
+          (workflowState.allowed_outcomes || []).forEach((outcome) => { const option = document.createElement('option'); option.value = outcome; option.textContent = labels[outcome] || outcome; select.appendChild(option); });
+          workflowActionControlsEl.append(select, workflowActionButton('Buat draft outcome', 'draft_decision'));
+        }
+        if (workflowState.status === 'WAITING_FOR_SA_CONFIRMATION') workflowActionControlsEl.appendChild(workflowActionButton('Konfirmasi keputusan', 'confirm_decision'));
+        if (workflowState.status === 'WAITING_FOR_CLARIFICATION') workflowActionControlsEl.appendChild(workflowActionButton('Lanjutkan setelah informasi tersedia', 'resume_decision'));
+        if (workflowState.status === 'WORKFLOW_UPDATED') workflowActionControlsEl.appendChild(workflowActionButton('Tandai workflow selesai', 'complete_workflow'));
+      }
+      function updateWorkflow(workflow) { workflowState = workflow ? JSON.parse(JSON.stringify(workflow)) : null; updateContextStrip(); renderWorkflowSummary(); renderWorkflowActions(); }
+      async function performWorkflowAction(action, extra = {}) {
+        if (!fixtureState || !workflowState) return;
+        const button = [...workflowActionControlsEl.querySelectorAll('button')].find((item) => item.dataset.workflowAction === action);
+        if (button) button.disabled = true;
+        try {
+          const response = await fetch('/api/student-tower/workflows/action', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ studentFixtureId: fixtureState.student_id, workflowId: workflowState.workflow_id, workflowSessionId, action, ...extra }) });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Workflow tidak dapat diperbarui.');
+          updateWorkflow(data.workflow);
+          const statusText = workflowUpdateMessages[data.workflow.status] || 'Status tindak lanjut sudah diperbarui.';
+          if (action === 'save_raw_note') {
+            addMessage('assistant', 'Catatan tersimpan. Aku akan merapikannya menjadi ringkasan untuk kamu tinjau.', 'Workflow Student Tower');
+            clearStructuredDraft();
+            inputEl.value = 'Tolong ekstrak catatan konsultasi yang baru kusimpan. Tampilkan hanya hal yang disebutkan dan tandai informasi yang belum diketahui.';
+            document.getElementById('composer').requestSubmit();
+          } else {
+            const actionPlan = data.workflow.action_plan ? `\n\nUntuk menjalankannya: ${data.workflow.action_plan.action} Pemiliknya ${data.workflow.action_plan.owner}; evaluasi ulang ${data.workflow.action_plan.review}.` : '';
+            addMessage('assistant', `${statusText}\n\n${data.workflow.next_action || 'Tidak ada tindakan lanjutan.'}${actionPlan}`, 'Workflow Student Tower');
+          }
+        } catch (error) {
+          addMessage('assistant', `Workflow belum diperbarui: ${error.message}`, 'Workflow Student Tower');
+          renderWorkflowActions();
+        }
+      }
+      function bindSuggestionHandlers(root = document) {
+        root.querySelectorAll('.suggestion').forEach((button) => {
+          if (button.dataset.bound === 'true') return;
+          button.dataset.bound = 'true';
+          button.addEventListener('click', () => {
+            if (button.dataset.intent) return setDraftFromIntent(button.dataset.intent);
+            clearStructuredDraft();
+            inputEl.value = button.dataset.prompt || button.textContent;
+            inputEl.focus();
+          });
+        });
+      }
+      function welcomeMarkup() {
+        const workflow = workflowState || getActiveWorkflow();
+        const title = fixtureState ? 'Mulai dari siswa ini' : 'Apa yang ingin kamu bantu hari ini?';
+        const description = fixtureState ? 'Data siswa sudah terhubung. Pilih tujuan, lalu edit draft sebelum dikirim.' : 'Pilih tujuan awal, lalu tulis detailnya dengan bahasamu sendiri.';
+        const brief = fixtureState ? contextBriefMarkup(fixtureState, workflow) : '';
+        const intentIds = workflow ? ['understand', 'progress', 'risk', 'action', 'consultation', 'note'] : ['understand', 'action', 'consultation', 'note'];
+        return `<div class="welcome" id="empty"><div class="welcome-icon">✦</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${brief}<div class="suggestions">${intentIds.map(intentChipMarkup).join('')}</div></div>`;
+      }
+      function resetConversation() {
+        history.length = 0;
+        lastUserMessage = '';
+        lastAssistantAnswer = '';
+        insightReady = false;
+        inputEl.value = '';
+        updateContextStrip();
+        renderWorkflowSummary();
+        renderWorkflowActions();
+        messagesEl.replaceChildren();
+        emptyEl = null;
+        messagesEl.innerHTML = welcomeMarkup();
+        emptyEl = document.getElementById('empty');
+        bindSuggestionHandlers();
+        contextHelperEl.hidden = true;
+        draftContextEl.hidden = true;
+        clearStructuredDraft();
+      }
       async function loadConfig() { const config = await fetch('/api/config').then((r) => r.json()); (config.models || []).forEach((model) => { const opt = document.createElement('option'); const id = typeof model === 'string' ? model : model.id; opt.value = id; opt.textContent = typeof model === 'string' ? model : model.label; opt.disabled = typeof model !== 'string' && !model.available; if (opt.disabled) opt.textContent += ' · belum dikonfigurasi'; modelEl.appendChild(opt); }); modelEl.value = config.defaultModel; const live = Boolean(config.hasApiKey && config.mode !== 'demo-local'); statusText.textContent = live ? `AI tersambung · ${config.mode}` : 'mode demo lokal'; statusDot.classList.toggle('ready', live); updateModelNote(config); return config; }
-      function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · asisten SA aktif`; }
+      function updateModelNote(config) { const selected = (config?.models || []).find((model) => (typeof model === 'string' ? model : model.id) === modelEl.value); const label = typeof selected === 'string' ? selected : selected?.label || modelEl.value || 'model gratis'; const context = fixtureState ? `Student Tower · ${fixtureState.student_id}` : 'asisten SA aktif'; modeNote.textContent = `${selected && typeof selected !== 'string' && !selected.available ? 'Fallback lokal · ' : ''}${label} · ${context}`; }
       let configState = null;
-      function updateModeNote() { if (compareMode) { modeNote.textContent = 'Membandingkan tiga rekan model'; return; } updateModelNote(configState); }
+      function updateModeNote() { if (compareMode) { modeNote.textContent = `Membandingkan tiga rekan model${fixtureState ? ` · Student Tower · ${fixtureState.student_id}` : ''}`; return; } updateModelNote(configState); }
+      async function loadStudentTowerFixtures() {
+        const data = await fetch('/api/student-tower/fixtures').then((response) => { if (!response.ok) throw new Error('Fixture Student Tower tidak tersedia.'); return response.json(); });
+        (data.students || []).forEach((student) => { const option = document.createElement('option'); option.value = student.student_id; option.textContent = `${student.student_id} · ${student.checkpoint}`; fixtureStudentEl.appendChild(option); });
+      }
+      function clearScenarioPicker(label = 'Pilih siswa terlebih dahulu') {
+        fixtureScenarios = [];
+        fixtureScenarioEl.innerHTML = `<option value="">${label}</option>`;
+        fixtureScenarioEl.disabled = true;
+        useScenarioEl.disabled = true;
+      }
+      function startEmptyChat() {
+        fixtureState = null;
+        workflowState = null;
+        resetFixturePickers();
+        setFixtureDrawerOpen(false);
+        resetConversation();
+        updateModeNote();
+      }
+      function populateWorkflowPicker(student) {
+        const workflows = student?.active_workflows || [];
+        fixtureWorkflowEl.innerHTML = '<option value="">Pilih workflow</option>';
+        workflows.forEach((workflow) => { const option = document.createElement('option'); option.value = workflow.workflow_id; option.textContent = workflow.title; fixtureWorkflowEl.appendChild(option); });
+        fixtureWorkflowEl.disabled = workflows.length === 0;
+        if (workflows.length) fixtureWorkflowEl.value = workflows.find((workflow) => workflow.status !== 'COMPLETED')?.workflow_id || workflows[0].workflow_id;
+      }
+      function populateScenarioPicker(scenarios) {
+        fixtureScenarios = scenarios || [];
+        fixtureScenarioEl.innerHTML = '<option value="">Pilih skenario</option>';
+        fixtureScenarios.forEach((scenario) => { const option = document.createElement('option'); option.value = scenario.scenario_id; option.textContent = scenario.title; fixtureScenarioEl.appendChild(option); });
+        fixtureScenarioEl.disabled = fixtureScenarios.length === 0;
+        useScenarioEl.disabled = true;
+      }
+      async function selectStudentFixture(studentId, preferredWorkflowId = '') {
+        if (!studentId) { fixtureState = null; workflowState = null; fixtureWorkflowEl.innerHTML = '<option value="">Pilih siswa terlebih dahulu</option>'; fixtureWorkflowEl.disabled = true; clearScenarioPicker(); resetConversation(); renderWorkflowActions(); updateModeNote(); setFixtureDrawerOpen(false); setSettingsOpen(false); return; }
+        try {
+          const response = await fetch(`/api/student-tower/fixtures/${encodeURIComponent(studentId)}`);
+          if (!response.ok) throw new Error('Fixture siswa tidak ditemukan.');
+          const data = await response.json();
+          fixtureState = data.student;
+          fixtureStudentEl.value = studentId;
+          populateWorkflowPicker(fixtureState);
+          if (preferredWorkflowId && fixtureState.active_workflows?.some((workflow) => workflow.workflow_id === preferredWorkflowId)) fixtureWorkflowEl.value = preferredWorkflowId;
+          workflowState = fixtureState.active_workflows?.find((workflow) => workflow.workflow_id === fixtureWorkflowEl.value) || null;
+          syncContextUrl(fixtureState.student_id, workflowState?.workflow_id || '');
+          insightReady = false;
+          populateScenarioPicker(data.scenarios);
+          const workflow = workflowState || getActiveWorkflow();
+          updateContextStrip();
+          renderWorkflowSummary();
+          renderWorkflowActions();
+          resetConversation();
+          history.push({ role:'assistant', content:`Konteks Student Tower terhubung untuk ${fixtureState.student_id}${workflow ? `, workflow ${workflow.title}` : ''}.` });
+          updateModeNote();
+          setFixtureDrawerOpen(false);
+          setSettingsOpen(false);
+        } catch (error) {
+          fixtureState = null;
+          workflowState = null;
+          syncContextUrl();
+          fixtureWorkflowEl.innerHTML = '<option value="">Workflow tidak tersedia</option>';
+          fixtureWorkflowEl.disabled = true;
+          clearScenarioPicker('Gagal memuat skenario');
+          resetConversation();
+          renderWorkflowActions();
+          updateModeNote();
+        }
+      }
       modelEl.addEventListener('change', () => updateModeNote());
       compareToggle.addEventListener('click', () => { compareMode = !compareMode; compareToggle.classList.toggle('active', compareMode); compareToggle.setAttribute('aria-pressed', String(compareMode)); compareToggle.textContent = compareMode ? '⇄ Chat tunggal' : '⇄ Bandingkan'; modelEl.disabled = compareMode; updateModeNote(); });
-      document.querySelectorAll('.suggestion').forEach((button) => button.addEventListener('click', () => { inputEl.value = button.textContent; inputEl.focus(); }));
+      fixtureToggleEl.addEventListener('click', () => { const open = !fixtureControlsEl.hidden; fixtureControlsEl.hidden = open; fixtureToggleEl.setAttribute('aria-expanded', String(!open)); fixtureToggleEl.textContent = open ? 'Atur konteks Student Tower' : 'Tutup'; });
+      fixtureControlsEl.hidden = true;
+      function setSettingsOpen(open) { settingsPanelEl.hidden = !open; settingsToggleEl.setAttribute('aria-expanded', String(open)); }
+      settingsToggleEl.addEventListener('click', () => setSettingsOpen(settingsPanelEl.hidden));
+      settingsCloseEl.addEventListener('click', () => setSettingsOpen(false));
+      fixtureStudentEl.addEventListener('change', () => selectStudentFixture(fixtureStudentEl.value));
+      changeContextEl.addEventListener('click', openStudentPicker);
+      clearContextEl.addEventListener('click', clearStudentContext);
+      connectStudentEl.addEventListener('click', openStudentPicker);
+      fixtureWorkflowEl.addEventListener('change', () => { workflowState = fixtureState?.active_workflows?.find((workflow) => workflow.workflow_id === fixtureWorkflowEl.value) || null; syncContextUrl(fixtureState?.student_id || '', workflowState?.workflow_id || ''); insightReady = false; updateContextStrip(); renderWorkflowSummary(); renderWorkflowActions(); resetConversation(); });
+      workflowDetailsToggleEl.addEventListener('click', () => { const open = workflowSummaryEl.classList.toggle('is-open'); workflowDetailsToggleEl.setAttribute('aria-expanded', String(open)); workflowDetailsToggleEl.textContent = open ? 'Sembunyikan detail workflow' : 'Lihat detail workflow'; workflowDetailsToggleEl.title = open ? 'Sembunyikan detail workflow' : 'Tampilkan detail workflow'; });
+      fixtureScenarioEl.addEventListener('change', () => { useScenarioEl.disabled = !fixtureScenarioEl.value; });
+      useScenarioEl.addEventListener('click', () => { const scenario = fixtureScenarios.find((item) => item.scenario_id === fixtureScenarioEl.value); const opening = scenario?.turns?.[0]?.message; if (!opening) return; inputEl.value = opening; inputEl.focus(); setSettingsOpen(false); });
+      clearDraftEl.addEventListener('click', () => clearStructuredDraft(true));
+      [draftGoalEl, draftFocusEl, draftOutputEl, draftNotesEl].forEach((field) => field.addEventListener('input', () => { if (structuredDraft) structuredDraft.dirty = true; }));
+      workflowActionControlsEl.addEventListener('click', (event) => { const button = event.target.closest('[data-workflow-action]'); if (!button) return; const action = button.dataset.workflowAction; if (action === 'save_raw_note') return performWorkflowAction(action, { note: lastUserMessage }); if (action === 'confirm_insight') return performWorkflowAction(action, { insight: lastAssistantAnswer }); if (action === 'draft_decision') return performWorkflowAction(action, { outcome: document.getElementById('workflowOutcome')?.value }); return performWorkflowAction(action); });
+      updateContextStrip();
+      renderWorkflowActions();
+      bindSuggestionHandlers();
       inputEl.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.getElementById('composer').requestSubmit(); } });
       document.getElementById('composer').addEventListener('submit', async (event) => {
-        event.preventDefault(); const message = inputEl.value.trim(); if (!message) return;
-        addMessage('user', message, 'Anda'); inputEl.value = ''; sendEl.disabled = true; sendEl.textContent = '…';
-        try { const endpoint = compareMode ? '/api/compare' : '/api/chat'; const payload = compareMode ? { message, history } : { message, model:modelEl.value, history }; const response = await fetch(endpoint, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); if (compareMode) { addComparison(data.results); history.push({ role:'user', content:message }, { role:'assistant', content:(data.results || []).map((result) => `${result.label}: ${result.answer || result.error || 'tidak tersedia'}`).join('\n') }); } else { const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); } }
+        event.preventDefault();
+        const extraInstruction = inputEl.value.trim();
+        const message = structuredDraft ? `${composeStructuredPrompt()}${extraInstruction ? `\n\nInstruksi tambahan:\n${extraInstruction}` : ''}` : extraInstruction;
+        if (!message) return;
+        addMessage('user', message, 'Anda'); lastUserMessage = message; insightReady = false; inputEl.value = ''; draftContextEl.hidden = true; sendEl.disabled = true; sendEl.textContent = '…'; renderWorkflowActions();
+        if (structuredDraft) clearStructuredDraft();
+        try { const endpoint = compareMode ? '/api/compare' : '/api/chat'; const studentFixtureId = fixtureState?.student_id || null; const workflowId = workflowState?.workflow_id || null; const basePayload = { message, history, studentFixtureId, workflowId, workflowSessionId }; const payload = compareMode ? basePayload : { ...basePayload, model:modelEl.value }; const response = await fetch(endpoint, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); if (data.workflow) updateWorkflow(data.workflow); if (compareMode) { addComparison(data.results); history.push({ role:'user', content:message }, { role:'assistant', content:(data.results || []).map((result) => `${result.label}: ${result.answer || result.error || 'tidak tersedia'}`).join('\n') }); } else { const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; lastAssistantAnswer = data.warning ? '' : (data.answer || ''); insightReady = Boolean(lastAssistantAnswer) && workflowState?.status === 'STRUCTURING_INSIGHT'; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); addConnectContextNudge(message); } renderWorkflowActions(); }
         catch (error) { addMessage('assistant', `Terjadi kendala: ${error.message}`, 'Error'); } finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
       });
       loadConfig().then((config) => { configState = config; updateModeNote(); }).catch((error) => { statusText.textContent='koneksi gagal'; modeNote.textContent=error.message; });
+      loadStudentTowerFixtures().then(() => {
+        const params = new URLSearchParams(window.location.search);
+        const studentId = params.get('studentId') || params.get('student_id') || params.get('student') || '';
+        const workflowId = params.get('workflowId') || params.get('workflow_id') || '';
+        if (studentId) return selectStudentFixture(studentId, workflowId);
+        startEmptyChat();
+      }).catch(() => startEmptyChat());
     </script>
   </body>
 </html>

@@ -2,6 +2,20 @@
 
 Prototype chat UI untuk mencoba knowledge base Linktree/Brain Academy. MVP ini memakai satu model hosted gratis supaya bisa dibagikan lewat URL publik.
 
+## Student Tower consultation fixtures
+
+Dataset sintetis permanen untuk eksplorasi chatbot konsultasi SA ada di `fixtures/student-tower/`. Gunakan `students.json` sebagai konteks siswa dan `scenarios.json` sebagai percakapan uji. Bentuk fixture mengikuti `schema.json`; jangan memakai data siswa nyata.
+
+Prototype mendukung chat kosong untuk menemukan tujuan SA dan entry dari workflow aktif Student Tower sintetis. Workflow dapat dilanjutkan di UI melalui persiapan konsultasi, pencatatan raw note, konfirmasi ekstraksi, draft outcome, konfirmasi SA, action plan, dan penyelesaian. Status simulasi disimpan sementara di memori server per sesi browser dan akan kembali ke fixture awal saat server dimulai ulang. Ini belum menulis ke Student Tower operasional. Skenario konsultasi tetap tersedia sebagai alat uji; fixture yang dipilih ikut dikirim ke chat dan perbandingan model.
+
+Untuk mensimulasikan pembukaan chatbot dari halaman detail siswa, gunakan deep-link berikut:
+
+`http://127.0.0.1:4310/?source=student-tower&studentId=student-dummy-001&workflowId=workflow-dummy-001`
+
+`studentId` wajib diisi untuk mengaktifkan konteks siswa. `workflowId` opsional; jika tidak dikirim, workflow aktif pertama siswa dipilih otomatis. Student Tower produksi nantinya cukup membangun URL dengan pola yang sama dari tombol "Buka chatbot".
+
+Saat workflow aktif, panel ringkasan menampilkan fokus konsultasi, informasi yang belum diketahui, tahap saat ini, keputusan draft/terkonfirmasi, serta action plan. Outcome Pivot menampilkan kandidat sintetis melalui tiga sudut pandang (minat siswa, pertimbangan keluarga, dan kemampuan/data simulasi) untuk direview SA; kandidat bukan rekomendasi final. Outcome "Tunda keputusan" tetap membuka workflow untuk tindak lanjut informasi sebelum keputusan disusun kembali.
+
 ## Jalankan lokal
 
 Dari folder `prototype/`:

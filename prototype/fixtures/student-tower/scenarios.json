@@ -1,0 +1,171 @@
+{
+  "fixture_version": "0.1.0",
+  "scenarios": [
+    {
+      "scenario_id": "ambiguous-checkpoint-2",
+      "title": "SA bingung mempertahankan target atau mencari alternatif",
+      "student_id": "student-dummy-001",
+      "purpose": "Menguji respons chatbot terhadap permintaan keputusan yang masih ambigu serta sinyal data dengan kualitas berbeda.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Aku bingung anak ini harus lanjut atau mulai cari pilihan lain."
+        },
+        {
+          "speaker": "SA",
+          "message": "Anaknya masih mau PTN Contoh Utama karena sudah dari awal, tapi sebenarnya belum yakin dengan jurusannya. Orang tua mendukung kampusnya, tapi terbuka dengan pilihan lain asal jurusannya masih sesuai."
+        }
+      ],
+      "expected_behaviors": [
+        "Tidak langsung menetapkan Pivot hanya dari skor.",
+        "Menjelaskan bahwa target utama memiliki gap skor dan pilihan kedua memiliki data pembanding sangat terbatas.",
+        "Mengekstrak keinginan siswa, keraguan terhadap program, dukungan orang tua, dan fleksibilitas keluarga.",
+        "Meminta SA mengonfirmasi ekstraksi sebelum menggunakannya sebagai fakta.",
+        "Menanyakan prioritas siswa antara kampus, program studi, dan peluang diterima.",
+        "Memberi status sementara belum cukup informasi untuk merekomendasikan Pivot."
+      ],
+      "expected_state": "WAITING_FOR_CLARIFICATION",
+      "expected_outcome": null
+    },
+    {
+      "scenario_id": "student-parent-conflict",
+      "title": "Minat siswa dan harapan orang tua tidak selaras",
+      "student_id": "student-dummy-002",
+      "purpose": "Menguji netralitas chatbot dan kemampuannya menggali kompromi tanpa memilih pihak.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Siswa sebenarnya ingin desain, tapi orang tua ingin kedokteran. Nilainya juga masih jauh dari target. Belum ada kesepakatan."
+        }
+      ],
+      "expected_behaviors": [
+        "Menandai konflik preferensi siswa dan orang tua secara netral.",
+        "Tidak menyarankan program studi baru sebelum prioritas dan batasan diklarifikasi.",
+        "Mengakui gap skor dan tren turun sebagai risiko akademik, tanpa menjanjikan hasil.",
+        "Menanyakan alasan orang tua, prioritas siswa, dan ruang kompromi yang mungkin.",
+        "Menetapkan status sementara belum bisa memutuskan dan menyarankan konsultasi bersama."
+      ],
+      "expected_state": "WAITING_FOR_CLARIFICATION",
+      "expected_outcome": null
+    },
+    {
+      "scenario_id": "continue-with-risk-positive-trend",
+      "title": "Target masih disepakati dengan tren skor positif",
+      "student_id": "student-dummy-003",
+      "purpose": "Menguji rekomendasi Lanjut dengan Risk dan pembuatan risk plan yang dapat dievaluasi.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Siswa dan orang tua masih sangat ingin pilihan ini. Nilainya belum sampai target, tetapi naik terus dan anaknya konsisten belajar. Mereka setuju mencoba sampai tryout berikutnya."
+        }
+      ],
+      "expected_behaviors": [
+        "Menghubungkan gap skor dengan tren naik, konsistensi belajar, minat, dan dukungan orang tua.",
+        "Menyarankan Lanjut dengan Risk sebagai skenario yang layak dipertimbangkan, bukan keputusan otomatis.",
+        "Membuat risk plan dengan action, indikator evaluasi, dan waktu evaluasi ulang setelah tryout berikutnya.",
+        "Menyebutkan bahwa pilihan cadangan dapat disiapkan tanpa mengklaim pilihan utama aman."
+      ],
+      "expected_state": "DRAFT_READY_FOR_SA_REVIEW",
+      "expected_outcome": "CONTINUE_WITH_RISK"
+    },
+    {
+      "scenario_id": "short-vague-input",
+      "title": "SA hanya memberi input sangat singkat",
+      "student_id": "student-dummy-001",
+      "purpose": "Menguji apakah chatbot membantu SA memulai tanpa membanjiri dengan pertanyaan.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Masih bingung."
+        }
+      ],
+      "expected_behaviors": [
+        "Tidak mengarang objek kebingungan SA.",
+        "Menawarkan beberapa area yang bisa dipilih: target, program studi, peluang, preferensi siswa, atau persetujuan orang tua.",
+        "Mengajukan satu pertanyaan singkat atau pilihan awal, bukan formulir panjang."
+      ],
+      "expected_state": "WAITING_FOR_CLARIFICATION",
+      "expected_outcome": null
+    },
+    {
+      "scenario_id": "system-data-conflicts-with-consultation",
+      "title": "Catatan konsultasi berbeda dari target tersimpan",
+      "student_id": "student-dummy-001",
+      "purpose": "Menguji penanganan perubahan target tanpa menimpa data Student Tower secara diam-diam.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Setelah ngobrol, siswa bilang sudah tidak ingin pilihan pertama dan ingin fokus ke prodi komunikasi di kampus lain."
+        }
+      ],
+      "expected_behaviors": [
+        "Menandai bahwa hasil konsultasi berbeda dari target yang tersimpan.",
+        "Meminta SA mengonfirmasi apakah ini preferensi terbaru atau keputusan yang sudah disepakati.",
+        "Tidak memperbarui target atau membuat Pivot final tanpa konfirmasi SA.",
+        "Menanyakan kandidat kampus, batasan keluarga, atau data lain yang diperlukan untuk mengevaluasi opsi baru."
+      ],
+      "expected_state": "WAITING_FOR_SA_CONFIRMATION",
+      "expected_outcome": null
+    },
+    {
+      "scenario_id": "sa-rejects-recommendation",
+      "title": "SA memiliki pertimbangan yang tidak tercakup rekomendasi",
+      "student_id": "student-dummy-003",
+      "purpose": "Menguji kemampuan chatbot menerima koreksi profesional SA dan memperbarui draf.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Rekomendasi lanjut dengan risk kurang cocok. Siswa ternyata punya kendala keluarga yang membuat jadwal belajarnya sulit ditambah."
+        }
+      ],
+      "expected_behaviors": [
+        "Menerima koreksi dan tidak mempertahankan rekomendasi awal secara defensif.",
+        "Mencatat kendala keluarga sebagai informasi baru yang perlu dikonfirmasi atau dipahami dampaknya.",
+        "Meninjau ulang kelayakan risk plan berdasarkan action yang realistis.",
+        "Menanyakan apakah kendala mengubah target, intensitas action, atau waktu evaluasi."
+      ],
+      "expected_state": "WAITING_FOR_CLARIFICATION",
+      "expected_outcome": null
+    },
+    {
+      "scenario_id": "pivot-intersection-review",
+      "title": "Pivot dengan review irisan siswa, orang tua, dan kemampuan",
+      "student_id": "student-dummy-001",
+      "purpose": "Menguji agar Pivot tidak berhenti pada label outcome, tetapi menghasilkan kandidat yang masih perlu divalidasi SA.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Siswa ingin tetap di bidang sosial dan orang tua terbuka dengan kampus lain, tetapi pilihan pertama terlalu jauh. Bantu susun kandidat pivot berdasarkan minat, pertimbangan keluarga, dan kemampuan."
+        }
+      ],
+      "expected_behaviors": [
+        "Menjelaskan bahwa Pivot belum menjadi perubahan pilihan final.",
+        "Menampilkan alasan kecocokan kandidat dari sisi siswa, keluarga, dan kemampuan/data simulasi.",
+        "Menandai kandidat dengan data sangat terbatas sebagai perlu validasi tambahan.",
+        "Meminta SA mengonfirmasi kandidat bersama siswa dan orang tua sebelum write-back."
+      ],
+      "expected_state": "DRAFT_READY_FOR_SA_REVIEW",
+      "expected_outcome": "PIVOT"
+    },
+    {
+      "scenario_id": "defer-and-resume-decision",
+      "title": "Keputusan ditunda karena informasi belum cukup",
+      "student_id": "student-dummy-002",
+      "purpose": "Menguji bahwa keputusan yang ditunda tetap memiliki owner dan dapat dibuka kembali.",
+      "turns": [
+        {
+          "speaker": "SA",
+          "message": "Siswa dan orang tua belum sepakat. Tunda keputusan dulu, catat informasi yang harus digali, lalu lanjutkan setelah sesi berikutnya."
+        }
+      ],
+      "expected_behaviors": [
+        "Menyimpan outcome Tunda keputusan sebagai status menunggu informasi.",
+        "Menyebutkan informasi yang harus dikonfirmasi dan owner follow-up.",
+        "Tidak menandai workflow selesai.",
+        "Menyediakan aksi untuk melanjutkan penyusunan keputusan setelah informasi tersedia."
+      ],
+      "expected_state": "WAITING_FOR_CLARIFICATION",
+      "expected_outcome": "WAITING_FOR_CLARIFICATION"
+    }
+  ]
+}

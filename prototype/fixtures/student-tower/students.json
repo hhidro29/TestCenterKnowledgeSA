@@ -1,0 +1,259 @@
+{
+  "fixture_version": "0.1.0",
+  "students": [
+    {
+      "student_id": "student-dummy-001",
+      "student_name": "Siswa Dummy 001",
+      "checkpoint": "TO_CHECKPOINT_2",
+      "admission_route": "SNBT",
+      "school": {
+        "name": "SMA Contoh Barat",
+        "province": "Jawa Barat"
+      },
+      "choices": [
+        {
+          "priority": 1,
+          "university": "PTN Contoh Utama",
+          "program": "Ilmu Komunikasi",
+          "route": "SNBT",
+          "simulation": {
+            "latest_score": 656,
+            "target_score": 704,
+            "student_percentile": 96,
+            "reference_percentile": 98,
+            "comparison_participants": 520,
+            "data_quality": "good",
+            "score_trend": "stable"
+          }
+        },
+        {
+          "priority": 2,
+          "university": "PTN Contoh Alternatif",
+          "program": "Kajian Lingkungan",
+          "route": "SNBT",
+          "simulation": {
+            "latest_score": 656,
+            "target_score": 585,
+            "student_percentile": 92,
+            "reference_percentile": 95,
+            "comparison_participants": 38,
+            "data_quality": "very_limited",
+            "score_trend": "stable"
+          }
+        }
+      ],
+      "profiling": {
+        "interest_status": "still_exploring",
+        "preferred_fields": ["social sciences", "communication"],
+        "preferred_province": "Jawa Barat",
+        "willing_to_study_outside_preferred_province": true,
+        "willing_to_have_backup_choice": true,
+        "learning_strength": "theory",
+        "learning_risks": ["inconsistent study routine", "procrastination", "difficulty with quantitative subjects"]
+      },
+      "parent_context": {
+        "discussion_status": "completed",
+        "preferred_university_types": ["reputable public university"],
+        "considerations": ["study cost", "location", "program fit"],
+        "support_status": "supportive_with_considerations",
+        "decision_participants": ["student", "parent_or_guardian"]
+      },
+      "previous_decisions": [
+        {
+          "checkpoint": "TO_CHECKPOINT_1",
+          "outcome": "CONTINUE_WITH_RISK",
+          "reason": "Target remains preferred; competitiveness needs monitoring."
+        }
+      ],
+      "previous_actions": [
+        {
+          "action": "Increase weekly study routine.",
+          "owner": "student",
+          "status": "INCONSISTENT"
+        }
+      ],
+      "active_workflows": [
+        {
+          "workflow_id": "workflow-dummy-001",
+          "title": "Evaluasi pilihan setelah TO Checkpoint 2",
+          "status": "NEEDS_ACTION",
+          "trigger": "Gap target utama masih 48 poin dan minat terhadap program studi belum mantap.",
+          "objective": "Mendapatkan keputusan Lanjut, Lanjut dengan Risk, Pivot, atau menunda keputusan.",
+          "owner": "SA",
+          "participants": ["student", "parent_or_guardian"],
+          "consultation_focus": [
+            "Prioritas siswa: kampus, program studi, atau peluang diterima",
+            "Posisi orang tua dan batasan biaya atau lokasi",
+            "Kesediaan menyiapkan pilihan cadangan"
+          ],
+          "missing_information": [
+            "Alasan siswa masih memilih target utama",
+            "Seberapa penting program studi dibanding kampus",
+            "Ruang kompromi yang dapat diterima siswa dan orang tua"
+          ],
+          "next_action": "Jadwalkan konsultasi untuk mengonfirmasi prioritas siswa dan posisi orang tua.",
+          "success_criteria": [
+            "Prioritas antara kampus, program studi, dan peluang diterima sudah dikonfirmasi.",
+            "Posisi orang tua dan ruang kompromi sudah dicatat.",
+            "Ada outcome yang dikonfirmasi SA atau alasan penundaan yang jelas."
+          ],
+          "allowed_outcomes": ["CONTINUE", "CONTINUE_WITH_RISK", "PIVOT", "WAITING_FOR_CLARIFICATION"]
+        }
+      ]
+    },
+    {
+      "student_id": "student-dummy-002",
+      "student_name": "Siswa Dummy 002",
+      "checkpoint": "TO_CHECKPOINT_2",
+      "admission_route": "SNBT",
+      "school": {
+        "name": "SMA Contoh Tengah",
+        "province": "Jawa Tengah"
+      },
+      "choices": [
+        {
+          "priority": 1,
+          "university": "PTN Contoh Medika",
+          "program": "Kedokteran",
+          "route": "SNBT",
+          "simulation": {
+            "latest_score": 612,
+            "target_score": 720,
+            "student_percentile": 84,
+            "reference_percentile": 97,
+            "comparison_participants": 1200,
+            "data_quality": "good",
+            "score_trend": "down"
+          }
+        }
+      ],
+      "profiling": {
+        "interest_status": "clear",
+        "preferred_fields": ["design", "visual communication"],
+        "willing_to_pivot": "unknown"
+      },
+      "parent_context": {
+        "discussion_status": "needs_follow_up",
+        "preferred_fields": ["health sciences"],
+        "support_status": "not_aligned_with_student_preference",
+        "decision_participants": ["student", "parent_or_guardian"]
+      },
+      "previous_decisions": [
+        {
+          "checkpoint": "TO_CHECKPOINT_1",
+          "outcome": "CONTINUE_WITH_RISK",
+          "reason": "Reassess after the next simulation."
+        }
+      ],
+      "previous_actions": [],
+      "active_workflows": [
+        {
+          "workflow_id": "workflow-dummy-002",
+          "title": "Menyelaraskan minat siswa dan harapan orang tua",
+          "status": "NEEDS_ACTION",
+          "trigger": "Siswa mengarah ke desain, sementara orang tua menginginkan bidang kesehatan dan skor target sedang menurun.",
+          "objective": "Mendapatkan kesepakatan arah pilihan tanpa memaksakan keputusan akademik sebelum minat dan batasan dibahas.",
+          "owner": "SA",
+          "participants": ["student", "parent_or_guardian"],
+          "consultation_focus": [
+            "Alasan siswa memilih desain dan alasan orang tua memilih kesehatan",
+            "Batasan kemampuan, biaya, lokasi, dan kesiapan belajar",
+            "Pilihan bidang atau program studi yang masih dapat diterima bersama"
+          ],
+          "missing_information": [
+            "Prioritas siswa dan tingkat keyakinannya",
+            "Kekhawatiran utama orang tua",
+            "Kandidat pilihan yang menjadi irisan kedua pihak"
+          ],
+          "next_action": "Jadwalkan konsultasi bersama siswa dan orang tua untuk memetakan alasan, batasan, dan ruang kompromi.",
+          "success_criteria": [
+            "Alasan orang tua dan prioritas siswa sudah terdokumentasi.",
+            "Pilihan yang masih dapat diterima kedua pihak sudah dipetakan.",
+            "Ada keputusan yang dikonfirmasi atau follow-up dengan pemilik dan deadline."
+          ],
+          "allowed_outcomes": ["CONTINUE", "CONTINUE_WITH_RISK", "PIVOT", "WAITING_FOR_CLARIFICATION"]
+        }
+      ]
+    },
+    {
+      "student_id": "student-dummy-003",
+      "student_name": "Siswa Dummy 003",
+      "checkpoint": "TO_CHECKPOINT_1",
+      "admission_route": "SNBT",
+      "school": {
+        "name": "SMA Contoh Selatan",
+        "province": "Jawa Timur"
+      },
+      "choices": [
+        {
+          "priority": 1,
+          "university": "PTN Contoh Mandiri",
+          "program": "Teknik Industri",
+          "route": "SNBT",
+          "simulation": {
+            "latest_score": 680,
+            "target_score": 695,
+            "student_percentile": 94,
+            "reference_percentile": 95,
+            "comparison_participants": 850,
+            "data_quality": "good",
+            "score_trend": "up"
+          }
+        }
+      ],
+      "profiling": {
+        "interest_status": "clear",
+        "preferred_fields": ["engineering", "operations"],
+        "study_routine": "consistent",
+        "willing_to_increase_study_time": true
+      },
+      "parent_context": {
+        "discussion_status": "completed",
+        "support_status": "supportive",
+        "considerations": []
+      },
+      "previous_decisions": [
+        {
+          "checkpoint": "PROFILING",
+          "outcome": "CONTINUE",
+          "reason": "Target aligns with student preference and family support."
+        }
+      ],
+      "previous_actions": [
+        {
+          "action": "Follow the agreed study schedule.",
+          "owner": "student",
+          "status": "COMPLETED"
+        }
+      ],
+      "active_workflows": [
+        {
+          "workflow_id": "workflow-dummy-003",
+          "title": "Mengevaluasi target setelah TO Checkpoint 1",
+          "status": "NEEDS_ACTION",
+          "trigger": "Skor masih di bawah target, tetapi tren naik dan siswa konsisten menjalankan action.",
+          "objective": "Menilai apakah target layak dipertahankan dengan risk plan yang realistis.",
+          "owner": "SA",
+          "participants": ["student", "parent_or_guardian"],
+          "consultation_focus": [
+            "Indikator nilai yang harus dicapai pada tryout berikutnya",
+            "Action belajar yang realistis dan pemiliknya",
+            "Kapan target dievaluasi ulang dan kapan pilihan cadangan disiapkan"
+          ],
+          "missing_information": [
+            "Target peningkatan yang disepakati",
+            "Bukti konsistensi action belajar",
+            "Batas waktu untuk pivot jika risiko tidak turun"
+          ],
+          "next_action": "Siapkan konsultasi untuk menyepakati indikator keberhasilan dan waktu evaluasi berikutnya.",
+          "success_criteria": [
+            "Risk plan memiliki action, owner, indikator, dan waktu evaluasi.",
+            "Siswa dan orang tua memahami risiko tanpa menganggap target sudah aman.",
+            "Outcome Lanjut dengan Risk dikonfirmasi atau alternatif disiapkan."
+          ],
+          "allowed_outcomes": ["CONTINUE", "CONTINUE_WITH_RISK", "PIVOT", "WAITING_FOR_CLARIFICATION"]
+        }
+      ]
+    }
+  ]
+}
