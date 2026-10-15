@@ -68,6 +68,23 @@
           },
           "additionalProperties": false
         },
+        "profile": {
+          "type": ["object", "null"],
+          "properties": {
+            "persona_status": { "enum": ["synthetic_persona", "real_profile"] },
+            "age": { "type": ["integer", "null"], "minimum": 15, "maximum": 25 },
+            "grade": { "type": ["string", "null"] },
+            "city": { "type": ["string", "null"] },
+            "academic_track": { "type": ["string", "null"] },
+            "strengths": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
+            "motivation": { "type": ["string", "null"] },
+            "learning_pattern": { "type": ["string", "null"] },
+            "decision_style": { "type": ["string", "null"] },
+            "family_context": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        },
         "data_note": { "type": "string" },
         "choices": { "type": "array", "items": { "$ref": "#/$defs/choice" } },
         "profiling": { "type": "object" },

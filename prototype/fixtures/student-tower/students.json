@@ -3,14 +3,27 @@
   "students": [
     {
       "student_id": "student-dummy-001",
-      "student_name": "Siswa Dummy 001",
+      "student_name": "Nadia Putri",
       "checkpoint": "TO_CHECKPOINT_2",
       "admission_route": "SNBT",
       "school": {
-        "name": "SMA Contoh Barat",
+        "name": "SMA Nusantara Bandung",
         "province": "Jawa Barat"
       },
-      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
+      "profile": {
+        "persona_status": "synthetic_persona",
+        "age": 17,
+        "grade": "Kelas 12 SMA",
+        "city": "Bandung",
+        "academic_track": "IPS",
+        "strengths": ["menyusun argumen", "presentasi"],
+        "interests": ["komunikasi", "isu sosial", "konten digital"],
+        "motivation": "Ingin belajar di kampus bereputasi dan bekerja di bidang komunikasi.",
+        "learning_pattern": "Cepat memahami materi teori, tetapi rutinitas belajar belum konsisten.",
+        "decision_style": "Cenderung mempertahankan pilihan awal sebelum membandingkan alternatif.",
+        "family_context": "Orang tua mendukung PTN bereputasi dengan perhatian pada biaya dan lokasi."
+      },
+      "data_note": "Nama siswa, sekolah, skor, preferensi, risiko, dan persona adalah sintetis. Nama PTN dan program studi mengikuti entitas nyata; metrik simulasi bukan data penerimaan resmi.",
       "choices": [
         {
           "priority": 1,
@@ -116,14 +129,27 @@
     },
     {
       "student_id": "student-dummy-002",
-      "student_name": "Siswa Dummy 002",
+      "student_name": "Raka Aditya",
       "checkpoint": "TO_CHECKPOINT_2",
       "admission_route": "SNBT",
       "school": {
-        "name": "SMA Contoh Tengah",
+        "name": "SMA Cakrawala Semarang",
         "province": "Jawa Tengah"
       },
-      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
+      "profile": {
+        "persona_status": "synthetic_persona",
+        "age": 17,
+        "grade": "Kelas 12 SMA",
+        "city": "Semarang",
+        "academic_track": "IPA",
+        "strengths": ["observasi visual", "mengerjakan proyek"],
+        "interests": ["desain", "komunikasi visual", "ilustrasi digital"],
+        "motivation": "Ingin mengembangkan kemampuan visual menjadi bidang studi dan pekerjaan yang nyata.",
+        "learning_pattern": "Lebih aktif saat mengerjakan proyek, tetapi mudah kehilangan fokus ketika belajar karena tekanan target keluarga.",
+        "decision_style": "Cenderung menunda menyampaikan preferensi agar tidak mengecewakan orang tua.",
+        "family_context": "Orang tua mengutamakan bidang kesehatan dan masih membutuhkan gambaran kemampuan serta prospek bidang desain."
+      },
+      "data_note": "Nama siswa, sekolah, skor, preferensi, risiko, dan persona adalah sintetis. Nama PTN dan program studi mengikuti entitas nyata; metrik simulasi bukan data penerimaan resmi.",
       "choices": [
         {
           "priority": 1,
@@ -197,14 +223,27 @@
     },
     {
       "student_id": "student-dummy-003",
-      "student_name": "Siswa Dummy 003",
+      "student_name": "Salsa Maharani",
       "checkpoint": "TO_CHECKPOINT_1",
       "admission_route": "SNBT",
       "school": {
-        "name": "SMA Contoh Selatan",
+        "name": "SMA Cakrawala Surabaya",
         "province": "Jawa Timur"
       },
-      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
+      "profile": {
+        "persona_status": "synthetic_persona",
+        "age": 17,
+        "grade": "Kelas 12 SMA",
+        "city": "Surabaya",
+        "academic_track": "IPA",
+        "strengths": ["penalaran kuantitatif", "memecah masalah"],
+        "interests": ["rekayasa", "proses", "efisiensi"],
+        "motivation": "Ingin belajar bidang yang menggabungkan matematika dengan penyelesaian masalah di dunia kerja.",
+        "learning_pattern": "Rutinitas belajar cukup konsisten dan responsif terhadap target mingguan yang terukur.",
+        "decision_style": "Nyaman mengambil keputusan setelah melihat indikator dan batas evaluasi yang jelas.",
+        "family_context": "Orang tua mendukung pilihan teknik selama rencana belajar dan batas risikonya jelas."
+      },
+      "data_note": "Nama siswa, sekolah, skor, preferensi, risiko, dan persona adalah sintetis. Nama PTN dan program studi mengikuti entitas nyata; metrik simulasi bukan data penerimaan resmi.",
       "choices": [
         {
           "priority": 1,

@@ -394,6 +394,11 @@
         if (student?.parent_context?.support_status === 'not_aligned_with_student_preference') summary.push('preferensi siswa dan orang tua belum selaras');
         return summary.length ? summary.join('; ') : 'Belum ada risiko utama yang tercatat';
       }
+      function getProfileSummary(student = fixtureState) {
+        const profile = student?.profile || {};
+        const basics = [profile.grade, profile.city, profile.academic_track].filter(Boolean);
+        return basics.length ? basics.join(' · ') : 'Profil ringkas belum tersedia';
+      }
       function formatChoice(choice) {
         if (!choice) return 'Pilihan PTN/prodi belum tersedia';
         return `${choice.university || 'PTN belum diisi'} · ${choice.program || 'prodi belum diisi'}`;
@@ -405,7 +410,7 @@
       }
       function contextBriefMarkup(student, workflow) {
         const choices = (student?.choices || []).slice(0, 2).map((choice) => `<div>${escapeHtml(formatChoice(choice))}</div>`).join('') || '<div>Pilihan PTN/prodi belum tersedia</div>';
-        return `<div class="student-brief"><div class="student-brief-head"><div><div class="student-brief-name">${escapeHtml(getStudentName(student))}</div><div class="student-brief-meta">${escapeHtml(student?.admission_route || 'Jalur belum diisi')} · ${escapeHtml(student?.checkpoint || 'Checkpoint belum diisi')}</div></div><span class="student-brief-status">Simulasi</span></div><div class="student-brief-grid"><div class="student-brief-item"><strong>Pilihan</strong>${choices}</div><div class="student-brief-item"><strong>Progress TO</strong>${escapeHtml(getProgressSummary(student))}</div><div class="student-brief-item"><strong>Risiko utama</strong>${escapeHtml(getRiskSummary(student))}</div><div class="student-brief-item"><strong>Status workflow</strong>${escapeHtml(workflowStatusLabels[workflow?.status] || 'Belum ada workflow')}</div></div>${workflow ? `<div class="student-brief-workflow"><strong>${escapeHtml(workflow.title || 'Workflow aktif')}</strong><br>${escapeHtml(workflow.next_action || workflow.objective || 'Tinjau kondisi siswa dan tentukan langkah berikutnya.')}</div>` : ''}<div class="student-brief-note">PTN/prodi mengikuti entitas nyata; nilai, target, persentil, dan risiko adalah data simulasi.</div></div>`;
+        return `<div class="student-brief"><div class="student-brief-head"><div><div class="student-brief-name">${escapeHtml(getStudentName(student))}</div><div class="student-brief-meta">${escapeHtml(student?.admission_route || 'Jalur belum diisi')} · ${escapeHtml(student?.checkpoint || 'Checkpoint belum diisi')}</div></div><span class="student-brief-status">Simulasi</span></div><div class="student-brief-grid"><div class="student-brief-item"><strong>Profil</strong>${escapeHtml(getProfileSummary(student))}</div><div class="student-brief-item"><strong>Pilihan</strong>${choices}</div><div class="student-brief-item"><strong>Progress TO</strong>${escapeHtml(getProgressSummary(student))}</div><div class="student-brief-item"><strong>Risiko utama</strong>${escapeHtml(getRiskSummary(student))}</div><div class="student-brief-item"><strong>Status workflow</strong>${escapeHtml(workflowStatusLabels[workflow?.status] || 'Belum ada workflow')}</div></div>${workflow ? `<div class="student-brief-workflow"><strong>${escapeHtml(workflow.title || 'Workflow aktif')}</strong><br>${escapeHtml(workflow.next_action || workflow.objective || 'Tinjau kondisi siswa dan tentukan langkah berikutnya.')}</div>` : ''}<div class="student-brief-note">Profil siswa, nilai, target, persentil, dan risiko adalah data simulasi; nama PTN/prodi memakai entitas nyata.</div></div>`;
       }
       function openStudentPicker() {
         setSettingsOpen(true);

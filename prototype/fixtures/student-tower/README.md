@@ -2,11 +2,11 @@
 
 Dataset sintetis kanonis untuk development, simulasi, demo, dan regression checks chatbot konsultasi SA.
 
-Identitas siswa, sekolah, skor, preferensi, risiko, dan percakapan di direktori ini tetap sintetis. Untuk membuat simulasi lebih dekat dengan percakapan SA, nama sebagian PTN dan program studi memakai entitas nyata dan disertai metadata referensi resmi. Angka TO, target, persentil, jumlah pembanding, tren, dan risiko tidak boleh dibaca sebagai passing grade, statistik penerimaan, atau peluang resmi.
+Identitas siswa, sekolah, persona, skor, preferensi, risiko, dan percakapan di direktori ini tetap sintetis. Persona memodelkan pola konsultasi siswa kelas 12 yang realistis, bukan individu nyata. Untuk membuat simulasi lebih dekat dengan percakapan SA, nama sebagian PTN dan program studi memakai entitas nyata dan disertai metadata referensi resmi. Angka TO, target, persentil, jumlah pembanding, tren, dan risiko tidak boleh dibaca sebagai passing grade, statistik penerimaan, atau peluang resmi.
 
 ## Isi
 
-- `students.json`: snapshot sintetis kondisi siswa mengikuti bentuk konteks Student Tower, termasuk workflow aktif yang membutuhkan tindakan SA dan referensi entitas PTN/prodi nyata.
+- `students.json`: snapshot sintetis kondisi siswa mengikuti bentuk konteks Student Tower, termasuk persona konsultasi, workflow aktif yang membutuhkan tindakan SA, dan referensi entitas PTN/prodi nyata.
 - `scenarios.json`: skenario percakapan dan perilaku yang diharapkan, direferensikan melalui `student_id`.
 - `schema.json`: kontrak struktur data fixture.
 
