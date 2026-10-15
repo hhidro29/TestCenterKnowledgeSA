@@ -441,7 +441,7 @@
       }
       function structuredDisplayMessage() {
         const draft = getDraftValues();
-        const lines = [`Saya ingin membahas ${draft.goal.toLowerCase()}.`, `Fokusnya: ${draft.focus}`, `Tolong bantu saya dengan: ${draft.output}`];
+        const lines = [`Saya ingin membahas ${draft.goal}.`, `Fokusnya: ${draft.focus}`, `Tolong bantu saya dengan: ${draft.output}`];
         if (draft.notes) lines.push(`Catatan: ${draft.notes}`);
         return lines.filter(Boolean).join('\n\n');
       }
