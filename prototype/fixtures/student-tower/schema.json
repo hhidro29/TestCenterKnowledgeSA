@@ -24,6 +24,17 @@
         "university": { "type": "string" },
         "program": { "type": "string" },
         "route": { "type": "string" },
+        "reference": {
+          "type": "object",
+          "required": ["entity_status", "source_label", "source_url", "simulation_note"],
+          "properties": {
+            "entity_status": { "enum": ["real_entity", "synthetic_entity"] },
+            "source_label": { "type": "string" },
+            "source_url": { "type": "string", "format": "uri" },
+            "simulation_note": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
         "simulation": {
           "type": "object",
           "required": ["latest_score", "target_score", "student_percentile", "reference_percentile", "comparison_participants", "data_quality"],
@@ -57,6 +68,7 @@
           },
           "additionalProperties": false
         },
+        "data_note": { "type": "string" },
         "choices": { "type": "array", "items": { "$ref": "#/$defs/choice" } },
         "profiling": { "type": "object" },
         "parent_context": { "type": "object" },

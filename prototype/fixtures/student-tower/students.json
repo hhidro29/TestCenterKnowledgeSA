@@ -10,12 +10,19 @@
         "name": "SMA Contoh Barat",
         "province": "Jawa Barat"
       },
+      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
       "choices": [
         {
           "priority": 1,
-          "university": "PTN Contoh Utama",
+          "university": "Universitas Gadjah Mada",
           "program": "Ilmu Komunikasi",
           "route": "SNBT",
+          "reference": {
+            "entity_status": "real_entity",
+            "source_label": "Portal resmi penerimaan UGM",
+            "source_url": "https://admissions.ugm.ac.id/",
+            "simulation_note": "Entitas kampus/prodi nyata; seluruh metrik simulasi tidak mewakili peluang atau passing grade resmi."
+          },
           "simulation": {
             "latest_score": 656,
             "target_score": 704,
@@ -28,9 +35,15 @@
         },
         {
           "priority": 2,
-          "university": "PTN Contoh Alternatif",
-          "program": "Kajian Lingkungan",
+          "university": "Universitas Pendidikan Indonesia",
+          "program": "Ilmu Komunikasi",
           "route": "SNBT",
+          "reference": {
+            "entity_status": "real_entity",
+            "source_label": "Portal resmi penerimaan UPI",
+            "source_url": "https://pmb.upi.edu/",
+            "simulation_note": "Entitas kampus/prodi nyata; kualitas data pembanding di fixture tetap simulasi."
+          },
           "simulation": {
             "latest_score": 656,
             "target_score": 585,
@@ -110,12 +123,19 @@
         "name": "SMA Contoh Tengah",
         "province": "Jawa Tengah"
       },
+      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
       "choices": [
         {
           "priority": 1,
-          "university": "PTN Contoh Medika",
-          "program": "Kedokteran",
+          "university": "Universitas Indonesia",
+          "program": "Pendidikan Dokter",
           "route": "SNBT",
+          "reference": {
+            "entity_status": "real_entity",
+            "source_label": "Portal resmi penerimaan UI",
+            "source_url": "https://penerimaan.ui.ac.id/",
+            "simulation_note": "Entitas kampus/prodi nyata; seluruh metrik simulasi tidak mewakili peluang atau passing grade resmi."
+          },
           "simulation": {
             "latest_score": 612,
             "target_score": 720,
@@ -184,12 +204,19 @@
         "name": "SMA Contoh Selatan",
         "province": "Jawa Timur"
       },
+      "data_note": "Nama PTN dan program studi mengikuti entitas nyata. Skor, target, persentil, jumlah pembanding, tren, dan risiko adalah data simulasi untuk pengujian workflow.",
       "choices": [
         {
           "priority": 1,
-          "university": "PTN Contoh Mandiri",
+          "university": "Institut Teknologi Sepuluh Nopember",
           "program": "Teknik Industri",
           "route": "SNBT",
+          "reference": {
+            "entity_status": "real_entity",
+            "source_label": "Portal resmi penerimaan ITS",
+            "source_url": "https://www.its.ac.id/id/penerimaan-mahasiswa-baru/",
+            "simulation_note": "Entitas kampus/prodi nyata; seluruh metrik simulasi tidak mewakili peluang atau passing grade resmi."
+          },
           "simulation": {
             "latest_score": 680,
             "target_score": 695,

@@ -2,11 +2,11 @@
 
 Dataset sintetis kanonis untuk development, simulasi, demo, dan regression checks chatbot konsultasi SA.
 
-Semua nama, institusi, program studi, skor, preferensi, dan percakapan di direktori ini dibuat untuk kebutuhan pengembangan. Jangan mengganti fixture dengan data siswa nyata.
+Identitas siswa, sekolah, skor, preferensi, risiko, dan percakapan di direktori ini tetap sintetis. Untuk membuat simulasi lebih dekat dengan percakapan SA, nama sebagian PTN dan program studi memakai entitas nyata dan disertai metadata referensi resmi. Angka TO, target, persentil, jumlah pembanding, tren, dan risiko tidak boleh dibaca sebagai passing grade, statistik penerimaan, atau peluang resmi.
 
 ## Isi
 
-- `students.json`: snapshot sintetis kondisi siswa mengikuti bentuk konteks Student Tower, termasuk workflow aktif yang membutuhkan tindakan SA.
+- `students.json`: snapshot sintetis kondisi siswa mengikuti bentuk konteks Student Tower, termasuk workflow aktif yang membutuhkan tindakan SA dan referensi entitas PTN/prodi nyata.
 - `scenarios.json`: skenario percakapan dan perilaku yang diharapkan, direferensikan melalui `student_id`.
 - `schema.json`: kontrak struktur data fixture.
 

@@ -12,7 +12,7 @@ Dummy data permanen untuk development dan pengujian chatbot konsultasi SA sekara
 ## Prinsip
 
 - JSON fixture adalah sumber kanonis; hindari menyalin data yang sama ke dokumen lain.
-- Semua identitas, sekolah, kampus, program studi, skor, dan catatan bersifat sintetis.
+- Identitas siswa, sekolah, skor, preferensi, risiko, dan catatan bersifat sintetis. Nama sebagian PTN/prodi memakai entitas nyata dan memiliki metadata sumber resmi; metrik simulasi tetap bukan data penerimaan resmi.
 - `students.json` memodelkan snapshot konteks siswa.
 - `scenarios.json` memodelkan percakapan yang perlu diuji dan perilaku yang diharapkan.
 - Expected behavior menguji kualitas proses, bukan kecocokan jawaban kata demi kata.
