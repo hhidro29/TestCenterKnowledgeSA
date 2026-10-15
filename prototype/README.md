@@ -6,7 +6,9 @@ Prototype chat UI untuk mencoba knowledge base Linktree/Brain Academy. MVP ini m
 
 Dataset sintetis permanen untuk eksplorasi chatbot konsultasi SA ada di `fixtures/student-tower/`. Gunakan `students.json` sebagai konteks siswa dan `scenarios.json` sebagai percakapan uji. Bentuk fixture mengikuti `schema.json`; jangan memakai data siswa nyata.
 
-Prototype mendukung chat kosong untuk menemukan tujuan SA dan entry dari workflow aktif Student Tower sintetis. Workflow dapat dilanjutkan di UI melalui persiapan konsultasi, pencatatan raw note, konfirmasi ekstraksi, draft outcome, konfirmasi SA, action plan, dan penyelesaian. Status simulasi disimpan sementara di memori server per sesi browser dan akan kembali ke fixture awal saat server dimulai ulang. Ini belum menulis ke Student Tower operasional. Skenario konsultasi tetap tersedia sebagai alat uji; fixture yang dipilih ikut dikirim ke chat dan perbandingan model.
+Prototype diposisikan sebagai **co-pilot konsultasi SA**: membantu membaca sinyal Student Tower, menyiapkan cara membawakan sesi, mendampingi klarifikasi, dan merapikan hasil konsultasi menjadi workflow. SA tetap memegang relasi, percakapan, dan keputusan akhir.
+
+Prototype mendukung chat kosong untuk menemukan tujuan SA dan entry dari workflow aktif Student Tower sintetis. Prompt chip membuka rancangan bantuan yang dapat diedit per bagian, bukan satu prompt teknis panjang. Workflow dapat dilanjutkan di UI melalui persiapan konsultasi, pencatatan raw note, konfirmasi ekstraksi, draft outcome, konfirmasi SA, action plan, dan penyelesaian. Status simulasi disimpan sementara di memori server per sesi browser dan akan kembali ke fixture awal saat server dimulai ulang. Ini belum menulis ke Student Tower operasional. Skenario konsultasi tetap tersedia sebagai alat uji; fixture yang dipilih ikut dikirim ke chat dan perbandingan model.
 
 Untuk mensimulasikan pembukaan chatbot dari halaman detail siswa, gunakan deep-link berikut:
 
@@ -57,9 +59,11 @@ Variabel yang dipakai:
 
 ## Cara kerja
 
-1. Pertanyaan masuk ke server.
-2. Server mengambil potongan dokumen yang paling relevan dari `knowledge-base/`.
-3. Pertanyaan dan konteks dikirim ke Gemini.
-4. Jawaban ditampilkan seperti chat WhatsApp/Telegram bersama kartu sumber.
+1. SA memilih tujuan atau menulis dengan bahasa bebas.
+2. Jika tujuan berasal dari prompt chip, UI menyusun rancangan bantuan yang dapat diedit.
+3. Pertanyaan dan konteks siswa masuk ke server.
+4. Server mengambil potongan dokumen yang paling relevan dari `knowledge-base/`.
+5. Pertanyaan dan konteks dikirim ke model.
+6. Jawaban ditampilkan sebagai bantuan yang dapat dipakai SA dalam percakapan, bukan keputusan otomatis.
 
 Jika Gemini gagal atau kuota habis, aplikasi memberi jawaban retrieval lokal dan menandainya sebagai fallback.

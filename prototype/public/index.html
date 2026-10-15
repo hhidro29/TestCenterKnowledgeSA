@@ -219,12 +219,12 @@
       <section class="conversation">
         <div class="messages" id="messages">
           <div class="welcome" id="empty">
-            <div class="welcome-icon">✦</div><h1>Apa yang ingin kamu bantu hari ini?</h1>
-            <p>Pilih tujuan awal, lalu tulis detailnya dengan bahasamu sendiri.</p>
-            <div class="suggestions"><button class="suggestion" data-intent="understand"><span class="intent-label">Pahami kondisi siswa</span><span class="intent-description">Ringkas sinyal penting dan risiko utama</span></button><button class="suggestion" data-intent="action"><span class="intent-label">Tentukan tindakan berikutnya</span><span class="intent-description">Terjemahkan workflow menjadi langkah SA</span></button><button class="suggestion" data-intent="consultation"><span class="intent-label">Siapkan konsultasi</span><span class="intent-description">Susun fokus dan pertanyaan prioritas</span></button><button class="suggestion" data-intent="note"><span class="intent-label">Catat hasil konsultasi</span><span class="intent-description">Rapikan catatan raw menjadi insight</span></button></div>
+            <div class="welcome-icon">✦</div><h1>Bawa konsultasi siswa sampai jadi tindakan</h1>
+            <p>Aku bantu membaca sinyal, menyiapkan percakapan, dan merapikan hasilnya. Kamu tetap memegang kendali sesi.</p>
+            <div class="suggestions"><button class="suggestion" data-intent="understand"><span class="intent-label">Baca sinyal siswa</span><span class="intent-description">Pahami apa yang perlu dibahas</span></button><button class="suggestion" data-intent="action"><span class="intent-label">Lihat langkah SA berikutnya</span><span class="intent-description">Terjemahkan workflow menjadi tindakan</span></button><button class="suggestion" data-intent="consultation"><span class="intent-label">Siapkan cara membawakan sesi</span><span class="intent-description">Susun pembuka, pertanyaan, dan penutup</span></button><button class="suggestion" data-intent="note"><span class="intent-label">Rapikan hasil konsultasi</span><span class="intent-description">Ubah catatan raw menjadi kesepakatan</span></button></div>
           </div>
         </div>
-        <div class="composer-zone"><div class="context-helper" id="contextHelper" hidden><span>Gunakan data siswa untuk membuat analisis yang lebih spesifik.</span><button id="connectStudent" type="button">Hubungkan siswa</button></div><div class="draft-context" id="draftContext" hidden></div><section class="draft-editor" id="draftEditor" aria-label="Draft permintaan" hidden><div class="draft-editor-head"><div><div class="draft-editor-title">Draft permintaan</div><div class="draft-editor-hint">Edit bagian yang perlu disesuaikan sebelum dikirim.</div></div><button class="draft-clear" id="clearDraft" type="button">Hapus draft</button></div><div class="draft-fields"><div class="draft-field full"><label for="draftGoal">Tujuan</label><input id="draftGoal" type="text" /></div><div class="draft-field"><label for="draftFocus">Yang perlu dianalisis</label><textarea id="draftFocus" rows="3"></textarea></div><div class="draft-field"><label for="draftOutput">Output yang diharapkan</label><textarea id="draftOutput" rows="3"></textarea></div><div class="draft-field full"><label for="draftNotes">Catatan tambahan <span>(opsional)</span></label><textarea id="draftNotes" rows="2" placeholder="Tambahkan fokus, batasan, atau pertanyaan khusus…"></textarea></div></div></section><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Tanyakan ke rekan SA…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Asisten Student Advisor · info diperbarui 6 Oktober 2026</div></div>
+        <div class="composer-zone"><div class="context-helper" id="contextHelper" hidden><span>Hubungkan siswa agar aku bisa membantu membaca kondisi dan menyiapkan sesi.</span><button id="connectStudent" type="button">Hubungkan siswa</button></div><div class="draft-context" id="draftContext" hidden></div><section class="draft-editor" id="draftEditor" aria-label="Rancangan bantuan" hidden><div class="draft-editor-head"><div><div class="draft-editor-title">Rancang bantuan</div><div class="draft-editor-hint">Sesuaikan bagian yang ingin dibahas sebelum meminta bantuan.</div></div><button class="draft-clear" id="clearDraft" type="button">Hapus</button></div><div class="draft-fields"><div class="draft-field full"><label for="draftGoal">Tujuan sesi</label><input id="draftGoal" type="text" /></div><div class="draft-field"><label for="draftFocus">Yang ingin dibahas</label><textarea id="draftFocus" rows="3"></textarea></div><div class="draft-field"><label for="draftOutput">Bantuan yang dibutuhkan</label><textarea id="draftOutput" rows="3"></textarea></div><div class="draft-field full"><label for="draftNotes">Catatan tambahan <span>(opsional)</span></label><textarea id="draftNotes" rows="2" placeholder="Tambahkan kondisi, batasan, atau pertanyaan khusus…"></textarea></div></div></section><form class="composer" id="composer"><button class="icon-button" type="button" aria-label="Lampiran">＋</button><textarea id="input" placeholder="Ceritakan yang ingin kamu bahas…" rows="1"></textarea><button class="send" id="send" type="submit" aria-label="Kirim">➤</button></form><div class="note" id="modeNote">Co-pilot konsultasi SA · Student Tower</div></div>
       </section>
     </div>
     <script>
@@ -288,12 +288,12 @@
       let structuredDraft = null;
 
       const intentCatalog = {
-        understand: { label: 'Pahami kondisi siswa', detail: 'Ringkas sinyal penting dan risiko utama' },
-        progress: { label: 'Lihat progress TO', detail: 'Bandingkan nilai, tren, dan target' },
-        risk: { label: 'Evaluasi risiko pilihan', detail: 'Lihat risiko terhadap target pilihan' },
-        action: { label: 'Tentukan tindakan berikutnya', detail: 'Terjemahkan workflow menjadi langkah SA' },
-        consultation: { label: 'Siapkan konsultasi', detail: 'Susun fokus dan pertanyaan prioritas' },
-        note: { label: 'Catat hasil konsultasi', detail: 'Rapikan catatan raw menjadi insight' },
+        understand: { label: 'Baca sinyal siswa', detail: 'Pahami apa yang perlu dibahas' },
+        progress: { label: 'Bawa data ke percakapan', detail: 'Ubah skor dan tren menjadi pembahasan' },
+        risk: { label: 'Siapkan pembahasan risiko', detail: 'Jelaskan risiko tanpa menghakimi pilihan' },
+        action: { label: 'Lihat langkah SA berikutnya', detail: 'Terjemahkan workflow menjadi tindakan' },
+        consultation: { label: 'Siapkan cara membawakan sesi', detail: 'Susun pembuka, pertanyaan, dan penutup' },
+        note: { label: 'Rapikan hasil konsultasi', detail: 'Ubah catatan raw menjadi kesepakatan' },
       };
 
       function clock() { return new Intl.DateTimeFormat('id-ID', { hour:'2-digit', minute:'2-digit' }).format(new Date()); }
@@ -421,11 +421,11 @@
         const student = fixtureState;
         const name = getStudentName(student);
         const drafts = {
-          understand: { goal: `Pahami kondisi ${student ? name : 'siswa ini'}`, focus: 'Sinyal penting, risiko utama, dan informasi yang masih perlu dikonfirmasi.', output: 'Ringkasan kondisi; risiko utama; pertanyaan klarifikasi; tindakan SA berikutnya.' },
-          progress: { goal: `Evaluasi progress TO ${student ? name : 'siswa ini'}`, focus: 'Nilai terakhir, tren, target, perubahan checkpoint, dan risiko terhadap target.', output: 'Kondisi saat ini; gap ke target; perubahan dari checkpoint sebelumnya; risiko; tindakan SA berikutnya.' },
-          risk: { goal: `Evaluasi risiko pilihan ${student ? name : 'siswa ini'}`, focus: 'Nilai, tren TO, minat siswa, pertimbangan orang tua, kemampuan, dan kualitas data.', output: 'Risiko utama; faktor yang mendukung; informasi yang belum cukup; opsi tindakan yang bisa dipertimbangkan.' },
-          action: { goal: `Tentukan tindakan berikutnya untuk ${student ? name : 'kasus siswa ini'}`, focus: 'Workflow aktif, pemicu tindakan, informasi yang masih kurang, dan pihak yang perlu dilibatkan.', output: 'Satu langkah SA paling relevan; pertanyaan/data yang perlu dikumpulkan; kriteria selesai; tindak lanjut.' },
-          consultation: { goal: `Siapkan konsultasi ${student ? `untuk ${name}` : 'siswa ini'}`, focus: 'Tujuan sesi, prioritas siswa, posisi orang tua, kemampuan belajar, dan ruang kompromi.', output: 'Fokus pembicaraan; pertanyaan prioritas; informasi yang perlu dicatat; outcome yang perlu dikonfirmasi.' },
+          understand: { goal: `Baca sinyal kondisi ${student ? name : 'siswa ini'}`, focus: 'Sinyal penting, risiko utama, dan informasi yang masih perlu dikonfirmasi.', output: 'Ringkasan yang mudah disampaikan; pertanyaan klarifikasi; langkah SA berikutnya.' },
+          progress: { goal: `Bawa progress TO ${student ? name : 'siswa ini'} ke percakapan`, focus: 'Nilai terakhir, tren, target, perubahan checkpoint, dan risiko terhadap target.', output: 'Kalimat singkat untuk menjelaskan kondisi; pertanyaan untuk siswa/orang tua; langkah setelah pembahasan.' },
+          risk: { goal: `Siapkan pembahasan risiko pilihan ${student ? name : 'siswa ini'}`, focus: 'Nilai, tren TO, minat siswa, pertimbangan orang tua, kemampuan, dan kualitas data.', output: 'Cara menyampaikan risiko dengan netral; pertanyaan untuk menguji prioritas; opsi yang perlu dipertimbangkan.' },
+          action: { goal: `Tentukan langkah SA berikutnya untuk ${student ? name : 'kasus siswa ini'}`, focus: 'Workflow aktif, pemicu tindakan, informasi yang masih kurang, dan pihak yang perlu dilibatkan.', output: 'Satu langkah yang bisa dilakukan sekarang; cara mengajak siswa/orang tua; kriteria sesi selesai; tindak lanjut.' },
+          consultation: { goal: `Siapkan cara membawakan sesi ${student ? `untuk ${name}` : 'siswa ini'}`, focus: 'Tujuan sesi, perbedaan prioritas siswa dan orang tua, data yang perlu dibawa, dan ruang kompromi.', output: 'Cara membuka sesi; cara menyampaikan data; pertanyaan prioritas; cara menutup dengan kesepakatan.' },
           note: { goal: `Rapikan hasil konsultasi ${student ? `dengan ${name}` : 'dengan siswa ini'}`, focus: 'Catatan raw konsultasi yang akan ditempel di bagian Catatan tambahan.', output: 'Fakta yang disebutkan; posisi siswa; posisi orang tua; kemampuan; risiko; kesepakatan; informasi yang belum diketahui.' },
         };
         return drafts[intentId] || drafts.action;
@@ -439,6 +439,12 @@
         if (draft.notes) sections.push(`Catatan tambahan:\n${draft.notes}`);
         return sections.filter(Boolean).join('\n\n');
       }
+      function structuredDisplayMessage() {
+        const draft = getDraftValues();
+        const lines = [`Saya ingin membahas ${draft.goal.toLowerCase()}.`, `Fokusnya: ${draft.focus}`, `Tolong bantu saya dengan: ${draft.output}`];
+        if (draft.notes) lines.push(`Catatan: ${draft.notes}`);
+        return lines.filter(Boolean).join('\n\n');
+      }
       function clearStructuredDraft(focusInput = false) {
         structuredDraft = null;
         draftEditorEl.hidden = true;
@@ -447,7 +453,7 @@
         draftFocusEl.value = '';
         draftOutputEl.value = '';
         draftNotesEl.value = '';
-        inputEl.placeholder = 'Tanyakan ke rekan SA…';
+        inputEl.placeholder = 'Ceritakan yang ingin kamu bahas…';
         if (focusInput) inputEl.focus();
       }
       function renderStructuredDraft(draft) {
@@ -589,7 +595,7 @@
         workflowActionsEl.hidden = false;
         workflowActionHintEl.textContent = workflowState.next_action || `Workflow ${workflowState.status}`;
         workflowActionControlsEl.replaceChildren();
-        if (workflowState.status === 'NEEDS_ACTION') workflowActionControlsEl.appendChild(workflowActionButton('Siapkan konsultasi', 'prepare_consultation'));
+        if (workflowState.status === 'NEEDS_ACTION') workflowActionControlsEl.appendChild(workflowActionButton('Siapkan cara membawakan sesi', 'prepare_consultation'));
         if (workflowState.status === 'CONSULTATION_PREP') workflowActionControlsEl.appendChild(workflowActionButton('Mulai konsultasi', 'start_consultation'));
         if (workflowState.status === 'CONSULTATION_IN_PROGRESS') {
           const button = workflowActionButton('Simpan pesan terakhir sebagai catatan', 'save_raw_note');
@@ -648,8 +654,8 @@
       }
       function welcomeMarkup() {
         const workflow = workflowState || getActiveWorkflow();
-        const title = fixtureState ? 'Mulai dari siswa ini' : 'Apa yang ingin kamu bantu hari ini?';
-        const description = fixtureState ? 'Data siswa sudah terhubung. Pilih tujuan, lalu edit draft sebelum dikirim.' : 'Pilih tujuan awal, lalu tulis detailnya dengan bahasamu sendiri.';
+        const title = fixtureState ? 'Bawa sesi siswa ini sampai jadi tindakan' : 'Bawa konsultasi siswa sampai jadi tindakan';
+        const description = fixtureState ? 'Data siswa sudah terhubung. Pilih bagian yang ingin kamu siapkan, lalu sesuaikan sebelum meminta bantuan.' : 'Aku bantu membaca sinyal, menyiapkan percakapan, dan merapikan hasilnya. Kamu tetap memegang kendali sesi.';
         const brief = fixtureState ? contextBriefMarkup(fixtureState, workflow) : '';
         const intentIds = workflow ? ['understand', 'progress', 'risk', 'action', 'consultation', 'note'] : ['understand', 'action', 'consultation', 'note'];
         return `<div class="welcome" id="empty"><div class="welcome-icon">✦</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${brief}<div class="suggestions">${intentIds.map(intentChipMarkup).join('')}</div></div>`;
@@ -770,7 +776,8 @@
         const extraInstruction = inputEl.value.trim();
         const message = structuredDraft ? `${composeStructuredPrompt()}${extraInstruction ? `\n\nInstruksi tambahan:\n${extraInstruction}` : ''}` : extraInstruction;
         if (!message) return;
-        addMessage('user', message, 'Anda'); lastUserMessage = message; insightReady = false; inputEl.value = ''; draftContextEl.hidden = true; sendEl.disabled = true; sendEl.textContent = '…'; renderWorkflowActions();
+        const displayMessage = structuredDraft ? `${structuredDisplayMessage()}${extraInstruction ? `\n\nTambahan: ${extraInstruction}` : ''}` : message;
+        addMessage('user', displayMessage, 'Anda'); lastUserMessage = message; insightReady = false; inputEl.value = ''; draftContextEl.hidden = true; sendEl.disabled = true; sendEl.textContent = '…'; renderWorkflowActions();
         if (structuredDraft) clearStructuredDraft();
         try { const endpoint = compareMode ? '/api/compare' : '/api/chat'; const studentFixtureId = fixtureState?.student_id || null; const workflowId = workflowState?.workflow_id || null; const basePayload = { message, history, studentFixtureId, workflowId, workflowSessionId }; const payload = compareMode ? basePayload : { ...basePayload, model:modelEl.value }; const response = await fetch(endpoint, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Gagal memproses pertanyaan.'); if (data.workflow) updateWorkflow(data.workflow); if (compareMode) { addComparison(data.results); history.push({ role:'user', content:message }, { role:'assistant', content:(data.results || []).map((result) => `${result.label}: ${result.answer || result.error || 'tidak tersedia'}`).join('\n') }); } else { const warning = data.warning ? `\n\nCatatan koneksi: ${data.warning}` : ''; lastAssistantAnswer = data.warning ? '' : (data.answer || ''); insightReady = Boolean(lastAssistantAnswer) && workflowState?.status === 'STRUCTURING_INSIGHT'; addMessage('assistant', `${data.answer || 'Tidak ada jawaban.'}${warning}`, data.model || 'Demo lokal'); history.push({ role:'user', content:message }, { role:'assistant', content:data.answer || '' }); addConnectContextNudge(message); } renderWorkflowActions(); }
         catch (error) { addMessage('assistant', `Terjadi kendala: ${error.message}`, 'Error'); } finally { sendEl.disabled = false; sendEl.textContent = '➤'; }
