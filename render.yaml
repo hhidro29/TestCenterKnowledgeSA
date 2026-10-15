@@ -8,7 +8,7 @@ services:
     healthCheckPath: /api/config
     envVars:
       - key: AI_PROVIDER
-        value: groq
+        value: openai
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
       - key: GEMINI_API_KEY
@@ -16,6 +16,10 @@ services:
       - key: GROQ_MODEL
         value: qwen/qwen3.8-27b
       - key: GROQ_API_KEY
+        sync: false
+      - key: GPT_MODEL
+        value: gpt-5-mini
+      - key: OPENAI_API_KEY
         sync: false
       - key: MAX_REQUESTS_PER_MINUTE
         value: "30"

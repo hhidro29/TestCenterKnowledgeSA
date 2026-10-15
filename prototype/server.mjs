@@ -51,7 +51,7 @@ for (const line of localEnv.split(/\r?\n/)) {
 
 const PORT = Number(process.env.PORT || 4310);
 const HOST = process.env.HOST || "0.0.0.0";
-const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+const AI_PROVIDER = (process.env.AI_PROVIDER || "openai").toLowerCase();
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -66,8 +66,8 @@ const MAX_CONTEXT_CHARS = 24000;
 const MAX_REQUESTS_PER_MINUTE = Number(process.env.MAX_REQUESTS_PER_MINUTE || 30);
 
 const PROFILE_LABELS = { all: "Semua referensi" };
-const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : GEMINI_MODEL;
-const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : GEMINI_API_KEY;
+const ACTIVE_MODEL = AI_PROVIDER === "groq" ? GROQ_MODEL : AI_PROVIDER === "openai" ? GPT_MODEL : GEMINI_MODEL;
+const ACTIVE_API_KEY = AI_PROVIDER === "groq" ? GROQ_API_KEY : AI_PROVIDER === "openai" ? GPT_API_KEY : GEMINI_API_KEY;
 
 const MODEL_OPTIONS = [
   { id: GROQ_MODEL, label: `Qwen · ${GROQ_MODEL}`, provider: "groq", apiKey: GROQ_API_KEY },

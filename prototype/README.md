@@ -1,6 +1,6 @@
 # Knowledge Chatbot Prototype
 
-Prototype chat UI untuk mencoba knowledge base Linktree/Brain Academy. MVP ini memakai satu model hosted gratis supaya bisa dibagikan lewat URL publik.
+Prototype chat UI untuk mencoba knowledge base Linktree/Brain Academy. Model default-nya GPT-5 mini, dengan Qwen dan Gemini tetap tersedia sebagai pilihan alternatif.
 
 ## Student Tower consultation fixtures
 
@@ -29,11 +29,19 @@ npm start
 
 Buka <http://127.0.0.1:4310>.
 
-Tanpa `GEMINI_API_KEY`, aplikasi tetap berjalan dalam `demo-local`: server melakukan retrieval sederhana dari folder `knowledge-base/` dan menampilkan potongan sumber. Dengan key, server memakai Gemini API.
+Tanpa `OPENAI_API_KEY`, aplikasi tetap berjalan dalam `demo-local`: server melakukan retrieval sederhana dari folder `knowledge-base/` dan menampilkan potongan sumber. Dengan key, server memakai GPT-5 mini.
 
 ## Model dan API key
 
-Model default saat provider `groq` adalah `qwen/qwen3.8-27b`. Buat API key di <https://console.groq.com/keys>, lalu isi environment variable:
+Model default adalah `gpt-5-mini`. Isi API key OpenAI dan provider berikut:
+
+```bash
+AI_PROVIDER=openai
+OPENAI_API_KEY=...
+GPT_MODEL=gpt-5-mini
+```
+
+Qwen tetap tersedia melalui Groq:
 
 ```bash
 AI_PROVIDER=groq
@@ -41,11 +49,11 @@ GROQ_API_KEY=...
 GROQ_MODEL=qwen/qwen3.8-27b
 ```
 
-Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun Groq. API key hanya dibaca server; jangan menaruh nilainya di GitHub. Untuk kembali ke Gemini, gunakan `AI_PROVIDER=gemini` dan `GEMINI_API_KEY`.
+Model dapat diganti tanpa mengubah kode selama model tersebut tersedia untuk akun providernya. API key hanya dibaca server; jangan menaruh nilainya di GitHub. Untuk memakai Gemini, gunakan `AI_PROVIDER=gemini` dan `GEMINI_API_KEY`.
 
 Jika kedua key tersedia, dropdown di UI menampilkan Qwen dan Gemini sekaligus. Model dipilih per pesan; riwayat chat tetap dikirim agar percakapan bisa dilanjutkan saat berpindah model.
 
-GPT tersedia sebagai model tambahan jika `OPENAI_API_KEY` diisi. `GPT_MODEL` dapat digunakan untuk memilih model GPT yang tersedia pada akun OpenAI. API key tidak boleh dimasukkan ke repository.
+GPT-5 mini menjadi pilihan default ketika `OPENAI_API_KEY` tersedia. `GPT_MODEL` dapat digunakan untuk memilih model GPT yang tersedia pada akun OpenAI. API key tidak boleh dimasukkan ke repository.
 
 ## Deploy publik dengan Render
 
@@ -54,7 +62,8 @@ Repository sudah memiliki `render.yaml` di root. Di Render pilih **New Blueprint
 Variabel yang dipakai:
 
 - `GEMINI_API_KEY`: wajib untuk jawaban AI.
-- `GEMINI_MODEL`: default `gemini-3.5-flash-lite`.
+- `GPT_MODEL`: default `gpt-5-mini`.
+- `GEMINI_MODEL`: default `gemini-3.5-flash-lite` jika provider Gemini dipilih.
 - `MAX_REQUESTS_PER_MINUTE`: batas sederhana per alamat IP, default 30.
 
 ## Cara kerja

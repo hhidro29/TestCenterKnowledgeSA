@@ -1,6 +1,6 @@
 # TestCenter Knowledge SA
 
-Prototype chatbot untuk mencoba knowledge base Brain Academy/Ruangguru dengan satu model AI hosted gratis.
+Prototype chatbot untuk mencoba knowledge base Brain Academy/Ruangguru dengan GPT-5 mini sebagai model default.
 
 ## Jalankan lokal
 
@@ -12,26 +12,24 @@ npm start
 
 Buka <http://127.0.0.1:4310/>.
 
-Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI dengan Qwen, isi `GROQ_API_KEY` dan gunakan `AI_PROVIDER=groq`. Model default adalah `qwen/qwen3.8-27b`. Gemini tetap tersedia dengan `AI_PROVIDER=gemini`.
+Tanpa API key, prototype memakai retrieval lokal dari `knowledge-base/`. Untuk jawaban AI dengan GPT-5 mini, isi `OPENAI_API_KEY` dan gunakan `AI_PROVIDER=openai`. Qwen dan Gemini tetap tersedia dengan provider masing-masing.
 
 Di UI, model yang tersedia bisa dipilih per pesan. Agar keduanya aktif sekaligus, isi `GROQ_API_KEY` dan `GEMINI_API_KEY`; pilihan yang tidak memiliki key akan ditandai belum dikonfigurasi.
 
-GPT tersedia sebagai model tambahan jika `OPENAI_API_KEY` diisi. `GPT_MODEL` dapat digunakan untuk memilih model GPT yang tersedia pada akun OpenAI. API key tidak boleh di-commit.
+GPT-5 mini menjadi model default jika `OPENAI_API_KEY` diisi. `GPT_MODEL` dapat digunakan untuk memilih model GPT yang tersedia pada akun OpenAI. API key tidak boleh di-commit.
 
 ## Deploy publik
 
 Repository ini juga sudah memiliki konfigurasi Vercel. Import repository di Vercel dengan **Root Directory** tetap di root repository, lalu tambahkan environment variable berikut pada **Production** dan **Preview**:
 
 ```text
-AI_PROVIDER=groq
-GROQ_API_KEY=...
-GROQ_MODEL=qwen/qwen3.8-27b
+AI_PROVIDER=openai
 OPENAI_API_KEY=...
 GPT_MODEL=gpt-5-mini
 MAX_REQUESTS_PER_MINUTE=30
 ```
 
-Setelah **Redeploy**, endpoint `/api/config` harus menampilkan `mode: "gemini"`. `GEMINI_API_KEY` tidak boleh ditulis di frontend atau di-commit ke repository.
+Setelah **Redeploy**, endpoint `/api/config` harus menampilkan `defaultModel: "gpt-5-mini"`. `OPENAI_API_KEY` tidak boleh ditulis di frontend atau di-commit ke repository.
 
 ## Knowledge base
 
