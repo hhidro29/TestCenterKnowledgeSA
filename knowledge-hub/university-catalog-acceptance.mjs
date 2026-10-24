@@ -32,6 +32,11 @@ for (const [abbreviation, name] of priority) {
 }
 
 const gapRecords = programs.filter((item) => item.universityAbbreviation !== "UI" && !item.profile);
+const profileRecords = programs.filter((item) => item.profile);
+assert.equal(profileRecords.length + gapRecords.length, programs.length, "every non-UI catalog record is either profiled or explicitly marked as a gap");
+assert.ok(profileRecords.length >= 394, `profile coverage remains at or above the extracted baseline (${profileRecords.length})`);
+assert.ok(profileRecords.every((item) => item.profile.sourceUrl?.startsWith("https://app.ruangguru.com/kampus/") && item.profile.extractedAt), "profiled programs retain their source URL and extraction date");
 assert.ok(gapRecords.length > 0, "programs without rich source details are retained with an explicit gap");
 assert.ok(gapRecords.every((item) => item.metadata?.dataGap), "program detail gaps are explicit");
-console.log(`PASS | university catalog | ${universities.length} universities | ${programs.length} programs | ${priority.length} priority profiles checked | ${gapRecords.length} explicit gaps`);
+const coverage = ((profileRecords.length / programs.length) * 100).toFixed(1);
+console.log(`PASS | university catalog | ${universities.length} universities | ${programs.length} programs | ${profileRecords.length} sourced profiles (${coverage}%) | ${priority.length} priority profiles checked | ${gapRecords.length} explicit gaps`);

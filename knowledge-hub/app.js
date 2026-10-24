@@ -1,4 +1,4 @@
-import { KNOWLEDGE, POPULAR_SEARCHES } from "./data.js?build=20261024-21";
+import { KNOWLEDGE, POPULAR_SEARCHES } from "./data.js";
 import { QUOTA_HISTORY } from "./quota-data.js";
 
 const app = document.querySelector("#app");
@@ -14,6 +14,7 @@ const HOME_PLACEHOLDERS = [
 const PLACEHOLDER_ROTATION_MS = 4500;
 let placeholderRotationTimer = null;
 let placeholderIndex = 0;
+let pendingSearchTimer = null;
 
 const ROUTE_TYPES = new Set(["article", "university", "program", "faq", "ops-note"]);
 
@@ -300,7 +301,7 @@ function searchFields(item) {
   const structured = collectSearchValues({ sections: item.sections, catalog: item.catalog, highlights: item.highlights, profile: item.profile });
   if (attachedFaqs(item).length) structured.push("faq pertanyaan jawaban");
   if (item.ops?.length) structured.push("ops catatan operasional untuk SA");
-  if (item.profile) structured.push("profil program studi prospek kerja jenjang gelar kemampuan bidang yang dipelajari mata kuliah");
+  if (item.profile) structured.push("profil program studi prospek kerja jenjang gelar kemampuan bidang yang dipelajari pelajaran mata kuliah");
   if (quotaHistoryFor(item)?.history?.length) structured.push("data kompetisi historis jurusan prodi program studi pendaftar peminat kuota daya tampung jumlah kursi diterima peluang UTBK persaingan");
   return {
     title: normalize(item.title || item.name),
@@ -425,12 +426,12 @@ function requestedUniversityId(query) {
 
 function requestedProgramTokens(query, universityId) {
   const university = KNOWLEDGE.find((item) => item.id === universityId);
-  if (!university) return tokenize(query);
-  const universityTokens = new Set([university.name, university.abbreviation, university.title, ...(university.aliases || [])]
+  const universityTokens = new Set([university?.name, university?.abbreviation, university?.title, ...(university?.aliases || [])]
     .flatMap((value) => tokenize(value)));
   const queryNoise = new Set([
     "kuota", "daya", "tampung", "jumlah", "kursi", "peminat", "pendaftar", "persaingan", "peluang", "historis",
-    "utbk", "snbt", "mata", "kuliah", "pelajaran", "prospek", "kerja", "karier", "karir", "website", "resmi"
+    "utbk", "snbt", "mata", "kuliah", "pelajaran", "dipelajari", "bidang", "prospek", "kerja", "karier", "karir",
+    "kemampuan", "skill", "keterampilan", "jenjang", "gelar", "sejenis", "mirip", "website", "resmi"
   ]);
   return tokenize(query).filter((token) => !universityTokens.has(token) && !queryNoise.has(token));
 }
@@ -438,25 +439,46 @@ function requestedProgramTokens(query, universityId) {
 function searchMode(query) {
   const normalizedQuery = normalize(query);
   const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+  const searchableQueryTokens = tokenize(query);
   const quotaIntent = ["kuota", "daya tampung", "jumlah kursi", "jumlah kuota", "peminat", "pendaftar", "persaingan", "peluang historis"]
     .some((phrase) => normalizedQuery.includes(phrase));
   if (normalizedQuery.includes("kedokteran") || normalizedQuery.includes("pendidikan dokter")) return "study-program";
+  const universityRecords = KNOWLEDGE.filter((item) => item.entityType === "university");
+  // A complete canonical institution name is an institution lookup. Check
+  // this before program matching because every program title also contains
+  // its university name (e.g. "Universitas Indonesia").
+  const exactUniversityQuery = universityRecords.some((item) => [item.name, item.abbreviation, item.title, ...(item.aliases || [])]
+    .some((value) => normalize(value) === normalizedQuery));
+  if (exactUniversityQuery) return "university";
   // Route specific program-name queries to study-program entities before the
   // university abbreviation check. Without this, a query such as
   // "Ilmu Komputer UI" is classified as a university query because it
   // contains the UI abbreviation.
   const studyProgramRecords = KNOWLEDGE.filter((item) => item.entityType === "study-program");
+  const exactProgramQuery = studyProgramRecords.some((item) => [item.name, ...(item.aliases || [])]
+    .some((value) => normalize(value) === normalizedQuery));
+  const programIntentPhrases = [
+    "mata kuliah", "yang dipelajari", "pelajaran", "bidang studi", "prospek kerja", "kerja apa",
+    "karier", "karir", "kemampuan", "skill", "keterampilan", "jenjang", "gelar", "jurusan sejenis", "jurusan mirip"
+  ];
+  const programIntent = programIntentPhrases.some((phrase) => normalizedQuery.includes(phrase));
+  const programIntentTokens = new Set([
+    "mata", "kuliah", "pelajaran", "dipelajari", "bidang", "studi", "prospek", "kerja", "karier", "karir",
+    "kemampuan", "skill", "keterampilan", "jenjang", "gelar", "sejenis", "mirip"
+  ]);
   const studyProgramQuery = studyProgramRecords.some((item) => {
-    const programTokens = tokenize(`${item.name || ""} ${item.aliases || []}`);
-    const meaningfulQueryTokens = queryTokens.filter((token) => !["ui", "prodi", "jurusan", "program", "studi", "kuota", "daya", "tampung", "jumlah", "kursi", "peminat", "pendaftar", "persaingan", "peluang", "historis"].includes(token));
+    const programText = `${item.name || ""} ${(item.aliases || []).join(" ")}`;
+    const meaningfulQueryTokens = searchableQueryTokens.filter((token) => !programIntentTokens.has(token));
     const hasProgramDisambiguator = queryTokens.includes("ui")
       || queryTokens.some((token) => ["prodi", "jurusan", "program", "studi"].includes(token))
       || meaningfulQueryTokens.length >= 2;
-    return hasProgramDisambiguator && meaningfulQueryTokens.length > 0 && meaningfulQueryTokens.every((token) => programTokens.some((candidate) => tokenMatches(token, candidate)));
+    const hasProgramTerms = meaningfulQueryTokens.length > 0;
+    return hasProgramTerms
+      && meaningfulQueryTokens.every((token) => tokenMatches(token, programText))
+      && (hasProgramDisambiguator || programIntent);
   });
-  if (studyProgramQuery) return "study-program";
+  if (exactProgramQuery || studyProgramQuery || (programIntent && studyProgramRecords.some((item) => searchableQueryTokens.some((token) => tokenMatches(token, `${item.name || ""} ${(item.aliases || []).join(" ")}`))))) return "study-program";
   if (quotaIntent) {
-    const universityRecords = KNOWLEDGE.filter((item) => item.entityType === "university");
     const hasUniversityContext = universityRecords.some((item) => [item.name, item.abbreviation, item.title, ...(item.aliases || [])]
       .some((value) => queryTokens.includes(normalize(value)) || (normalize(value).length > 2 && normalizedQuery.includes(normalize(value)))));
     const hasProgramContext = queryTokens.some((token) => ["prodi", "jurusan", "program", "studi"].includes(token));
@@ -472,7 +494,6 @@ function searchMode(query) {
       return normalizedQuery === normalizedValue || (normalizedValue.length > 3 && normalizedQuery.includes(normalizedValue));
     }));
   if (admissionArticleMatch || normalizedQuery.includes("simak ui")) return "content";
-  const universityRecords = KNOWLEDGE.filter((item) => item.entityType === "university");
   const namesOrAliasesMatch = universityRecords.some((item) => [item.name, item.abbreviation, item.title, ...(item.aliases || [])]
     .some((value) => {
       const normalizedValue = normalize(value);
@@ -495,12 +516,30 @@ function entityMatchesQuery(item, mode, query) {
   if (mode === "study-program") {
     const universityId = requestedUniversityId(query);
     if (universityId && item.universityId !== universityId) return false;
+    // Catalog aliases also contain faculty labels. Keep canonical program
+    // names and aliases for routing, while excluding those metadata labels
+    // from term matching ("Ilmu Komputer" must not match every program in
+    // the Fakultas Ilmu Komputer).
+    const canonicalProgramValues = [item.name, ...(item.aliases || [])]
+      .filter((value) => value && !/^fakultas\b/i.test(String(value).trim()));
+    const programText = canonicalProgramValues.join(" ");
+    const exactProgramAlias = canonicalProgramValues
+      .filter(Boolean)
+      .some((value) => normalize(value) === normalizedQuery);
+    // Canonical program names and aliases should return only the entities
+    // that own that name. Without this guard, profile text such as a shared
+    // "mata kuliah" paragraph makes every rich program look like a match.
+    if (exactProgramAlias) return true;
     // Once an institution is named, require the remaining program terms to
     // match the program title/aliases. This prevents a shared profile phrase
     // such as "psikologi" in similar-majors or career text from returning
     // unrelated programs at the same university.
     const programTokens = requestedProgramTokens(query, universityId);
     const programQueryIntent = normalize(query).split(/\s+/).some((token) => ["prodi", "jurusan", "program", "studi"].includes(token));
+    // For an unscoped program or intent query, every meaningful term must be
+    // present in the program name/aliases. This keeps "pelajaran ilmu
+    // komputer" on Ilmu Komputer entities instead of unrelated Ilmu-* rows.
+    if (!universityId && programTokens.length && !canonicalProgramValues.some((value) => programTokens.every((token) => tokenMatches(token, value)))) return false;
     if ((programQueryIntent || universityId) && programTokens.length) {
       const programPhrase = programTokens.join(" ");
       const programName = normalize(item.name || "");
@@ -722,7 +761,15 @@ function studyProfileMarkup(item) {
   if (item.entityType !== "study-program" || !profile) return "";
   const degrees = (profile.degrees || []).map((degree) => [degree.abbreviation || degree.name, degree.description]);
   const prospects = (profile.careerProspects || []).map((prospect) => `<li><strong>${escapeHtml(prospect.role)}</strong>${prospect.description ? ` — ${renderInline(prospect.description)}` : ""}</li>`).join("");
-  const similar = (profile.similarMajors || []).map((major) => `<a class="similar-major" href="${escapeHtml(major.url)}" target="_blank" rel="noreferrer">${escapeHtml(major.name)} ↗</a>`).join("");
+  const similar = (profile.similarMajors || []).map((major) => {
+    const label = escapeHtml(major.name || "");
+    // Some catalog pages expose similar-major names without a resolvable URL.
+    // Keep those names useful as context instead of rendering a broken
+    // href="null" link.
+    return major.url
+      ? `<a class="similar-major" href="${escapeHtml(major.url)}" target="_blank" rel="noreferrer">${label} ↗</a>`
+      : `<span class="similar-major similar-major-unlinked">${label}</span>`;
+  }).join("");
   return `<section class="study-profile">
     <section id="${item.id}-profile-summary" data-anchor="${item.id}-profile-summary" class="article-section profile-section"><h2>Profil program studi</h2><p>${renderInline(profile.description || "")}</p></section>
     <section id="${item.id}-profile-overview" data-anchor="${item.id}-profile-overview" class="article-section profile-section"><h2>Gambaran studi</h2>${renderTextBlock(profile.studyOverview || "")}</section>
@@ -789,6 +836,17 @@ function homeView() {
       </form>
       <div class="popular"><span>Pencarian populer</span>${POPULAR_SEARCHES.map((query) => `<button data-query="${escapeHtml(query)}">${escapeHtml(query)}</button>`).join("")}</div>
     </section>
+  </main>`;
+}
+
+function searchLoadingView(query) {
+  return `${header({ compact: true })}<main class="search-loading" aria-live="polite" aria-busy="true">
+    <div class="search-loading-card">
+      <span class="loading-spinner" aria-hidden="true"></span>
+      <p class="eyebrow">Knowledge Hub</p>
+      <h1>Mencari informasi yang relevan</h1>
+      <p>Menyiapkan hasil untuk <strong>${escapeHtml(query)}</strong>…</p>
+    </div>
   </main>`;
 }
 
@@ -970,6 +1028,7 @@ function render() {
   // detail view. Fall back to the home screen when the record no longer
   // exists in the static catalog.
   const view = selectedItem ? articleView(selectedItem) : (state.query ? resultsView() : homeView());
+  app.removeAttribute?.("aria-busy");
   app.innerHTML = view;
   if (typeof document !== "undefined") {
     document.title = selectedItem
@@ -987,9 +1046,27 @@ function render() {
 }
 
 function submitSearch(query) {
-  navigateTo(searchPath(query), { replace: false });
-  const input = document.querySelector(".header-search input");
-  input?.focus();
+  const trimmed = String(query || "").trim();
+  if (pendingSearchTimer !== null) {
+    window.clearTimeout(pendingSearchTimer);
+    pendingSearchTimer = null;
+  }
+  if (!trimmed) {
+    navigateTo("/", { replace: false });
+    return;
+  }
+  stopPlaceholderRotation();
+  app.innerHTML = searchLoadingView(trimmed);
+  app.setAttribute("aria-busy", "true");
+  // Give the browser a frame to paint the loading state before the static
+  // index work and route render begin. This keeps the short local delay
+  // understandable without making the search feel artificially slow.
+  pendingSearchTimer = window.setTimeout(() => {
+    pendingSearchTimer = null;
+    navigateTo(searchPath(trimmed), { replace: false });
+    const input = document.querySelector(".header-search input");
+    input?.focus();
+  }, 60);
 }
 
 function bindEvents() {

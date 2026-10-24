@@ -1,10 +1,11 @@
 {
-  "rewrites": [
-    { "source": "/search", "destination": "/index.html" },
-    { "source": "/article/:path*", "destination": "/index.html" },
-    { "source": "/university/:path*", "destination": "/index.html" },
-    { "source": "/program/:path*", "destination": "/index.html" },
-    { "source": "/faq/:path*", "destination": "/index.html" },
-    { "source": "/ops-note/:path*", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    { "src": "**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(?:search|article|university|program|faq|ops-note)(?:/.*)?", "dest": "/index.html" },
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }

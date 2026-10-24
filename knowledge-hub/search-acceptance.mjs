@@ -40,6 +40,12 @@ const cases = [
   , ["jadwal pendaftaran UTBK", "snbt-2026-faq-24-kapan-jadwal-pendaftaran-utbk-snbt", "Judul"]
   , ["biaya UTBK", "snbt-2026-faq-25-berapa-biaya-pendaftaran-utbk-snbt", "Judul"]
   , ["perubahan aturan SNBT", "snbt-2026-faq-26-bagaimana-mengecek-pengumuman-dan-perubahan-aturan", "Judul"]
+  , ["Universitas Indonesia", "university-universitas-indonesia", "Judul"]
+  , ["Universitas Gadjah Mada", "university-universitas-gadjah-mada", "Judul"]
+  , ["Psikologi", "study-program-universitas-airlangga-psikologi", "Judul"]
+  , ["pelajaran ilmu komputer", "study-program-institut-pertanian-bogor-ilmu-komputer", "Bidang yang dipelajari"]
+  , ["mata kuliah psikologi", "study-program-universitas-gadjah-mada-psikologi", "Bidang yang dipelajari"]
+  , ["prospek kerja arsitektur UI", "study-program-universitas-indonesia-arsitektur", "Prospek kerja"]
 ];
 
 let failures = 0;
@@ -78,3 +84,19 @@ const komunikasiUnair = searchDetailed("Ilmu Komunikasi UNAIR");
 assert.equal(komunikasiUnair.length, 1, "named university/program query returns only the matching program");
 assert.equal(komunikasiUnair[0]?.item.universityAbbreviation, "Unair", "named program query is scoped to the requested university");
 console.log("PASS | entity disambiguation and regional filter regressions");
+
+const intentQueries = ["pelajaran ilmu komputer", "mata kuliah psikologi", "prospek kerja arsitektur"];
+for (const query of intentQueries) {
+  const results = searchDetailed(query);
+  assert.ok(results.length > 0, `${query} returns program results`);
+  assert.ok(results.every(({ item }) => item.entityType === "study-program"), `${query} excludes article/FAQ/university results`);
+}
+const genericArchitecture = searchDetailed("prospek kerja arsitektur");
+assert.ok(genericArchitecture.length >= 5, "generic architecture career query returns cross-university programs");
+assert.ok(searchDetailed("pelajaran ilmu komputer").every(({ item }) =>
+  [item.name, ...(item.aliases || [])].some((value) => {
+    const text = value.toLocaleLowerCase("id-ID");
+    return text.includes("ilmu") && text.includes("komputer");
+  })
+), "Ilmu Komputer intent excludes faculty-only aliases");
+console.log("PASS | program intent routing regressions");
