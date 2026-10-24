@@ -22,12 +22,12 @@ const cases = [
   ["jadwal pendaftaran STIS", "stis-2026", "jadwal"],
   ["jadwal STMKG", "stmkg-2026", "jadwal"],
   ["pendaftaran SIPENCATAR", "sipencatar-kemenhub-2026", "Pendaftaran"],
-  ["syarat IPDN", "panduan-sekolah-kedinasan-2026", "Dokumen"],
-  ["seleksi sekolah kedinasan", "panduan-sekolah-kedinasan-2026", "Alur"],
+  ["syarat IPDN", "ipdn-2026", "Konteks"],
+  ["seleksi sekolah kedinasan", "panduan-sekolah-kedinasan-2026", "Kapan artikel"],
   ["pendaftaran Poltek SSN", "poltek-ssn-2026", "Pendaftaran"],
   ["syarat Poltekpin", "poltekpin-2026", "persyaratan"],
   ["biaya Poltekimipas", "poltekimipas-2026", "biaya"],
-  ["portal STIN", "panduan-sekolah-kedinasan-2026", "Instansi"]
+  ["portal STIN", "stin-2026", "Konteks"]
   , ["cara daftar akun SNPMB", "snbt-2026-faq-13-cara-membuat-akun-snpmb-untuk-utbk-snbt", "Judul"]
   , ["isi biodata UTBK", "snbt-2026-faq-14-cara-mengisi-biodata-utbk-snbt", "Judul"]
   , ["KIP Kuliah gratis UTBK", "snbt-2026-faq-16-status-kip-kuliah-dan-biaya-utbk", "Jawaban"]

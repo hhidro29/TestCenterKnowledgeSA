@@ -1,5 +1,8 @@
 import { FAQ_RECORDS } from "./faq-data.js";
 import { UNIVERSITY_CATALOG, NON_UI_STUDY_PROGRAMS } from "./university-catalog.js";
+import { GENERATED_ADMISSIONS_ARTICLES } from "./generated-articles-admissions.js";
+import { GENERATED_KEDINASAN_ARTICLES } from "./generated-articles-kedinasan.js";
+import { GENERATED_TKA_INTERNAL_ARTICLES } from "./generated-articles-tka-internal.js";
 
 // Content is intentionally separate from the UI so future iterations can
 // replace this module with a CMS, JSON endpoint, or database-backed API.
@@ -21660,6 +21663,16 @@ for (let index = KNOWLEDGE.length - 1; index >= 0; index -= 1) {
 KNOWLEDGE.forEach((item) => {
   if (item.faqs) delete item.faqs;
 });
+const generatedArticleRecords = [
+  ...GENERATED_ADMISSIONS_ARTICLES,
+  ...GENERATED_KEDINASAN_ARTICLES,
+  ...GENERATED_TKA_INTERNAL_ARTICLES
+];
+const generatedArticleIds = new Set(generatedArticleRecords.map((article) => article.id));
+for (let index = KNOWLEDGE.length - 1; index >= 0; index -= 1) {
+  if (generatedArticleIds.has(KNOWLEDGE[index].id)) KNOWLEDGE.splice(index, 1);
+}
+KNOWLEDGE.push(...generatedArticleRecords);
 KNOWLEDGE.push(...FAQ_RECORDS);
 
 export const POPULAR_SEARCHES = [
