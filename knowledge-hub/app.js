@@ -11,7 +11,8 @@ const HOME_PLACEHOLDERS = [
   "Contoh: ketentuan pemilihan jurusan di UTBK",
   "Contoh: mata kuliah jurusan Teknik Komputer"
 ];
-const PLACEHOLDER_ROTATION_MS = 4500;
+const PLACEHOLDER_TYPE_SPEED_MS = 42;
+const PLACEHOLDER_PAUSE_MS = 1600;
 let placeholderRotationTimer = null;
 let placeholderIndex = 0;
 let pendingSearchTimer = null;
@@ -852,7 +853,7 @@ function searchLoadingView(query) {
 
 function stopPlaceholderRotation() {
   if (placeholderRotationTimer != null) {
-    window.clearInterval(placeholderRotationTimer);
+    window.clearTimeout(placeholderRotationTimer);
     placeholderRotationTimer = null;
   }
 }
@@ -860,8 +861,11 @@ function stopPlaceholderRotation() {
 function startPlaceholderRotation(input) {
   stopPlaceholderRotation();
   if (!input || input.value.trim() || document.activeElement === input) return;
-  placeholderRotationTimer = window.setInterval(() => {
-    // The home view can be replaced by a results or article view between ticks.
+  const text = HOME_PLACEHOLDERS[placeholderIndex];
+  let characterIndex = 0;
+
+  const typeNextCharacter = () => {
+    // The home view can be replaced by a result or article view between ticks.
     // Resolve the current input before updating so an old timer cannot mutate a
     // detached element.
     const currentInput = document.querySelector("[data-home-search]");
@@ -869,9 +873,19 @@ function startPlaceholderRotation(input) {
       stopPlaceholderRotation();
       return;
     }
-    placeholderIndex = (placeholderIndex + 1) % HOME_PLACEHOLDERS.length;
-    currentInput.placeholder = HOME_PLACEHOLDERS[placeholderIndex];
-  }, PLACEHOLDER_ROTATION_MS);
+    currentInput.placeholder = text.slice(0, characterIndex);
+    characterIndex += 1;
+    if (characterIndex <= text.length) {
+      placeholderRotationTimer = window.setTimeout(typeNextCharacter, PLACEHOLDER_TYPE_SPEED_MS);
+      return;
+    }
+    placeholderRotationTimer = window.setTimeout(() => {
+      placeholderIndex = (placeholderIndex + 1) % HOME_PLACEHOLDERS.length;
+      startPlaceholderRotation(currentInput);
+    }, PLACEHOLDER_PAUSE_MS);
+  };
+
+  typeNextCharacter();
 }
 
 function bindHomePlaceholder() {
