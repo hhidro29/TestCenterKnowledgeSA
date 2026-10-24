@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/search", "destination": "/index.html" },
+    { "source": "/article/:path*", "destination": "/index.html" },
+    { "source": "/university/:path*", "destination": "/index.html" },
+    { "source": "/program/:path*", "destination": "/index.html" },
+    { "source": "/faq/:path*", "destination": "/index.html" },
+    { "source": "/ops-note/:path*", "destination": "/index.html" }
+  ]
+}
