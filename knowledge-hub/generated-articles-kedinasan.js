@@ -30,8 +30,8 @@ export const GENERATED_KEDINASAN_ARTICLES = [
       "jadwal pendaftaran ipdn", "syarat ipdn", "kuota ipdn",
       "seleksi ipdn", "tes ipdn", "sekolah kedinasan ipdn"
     ],
-    summary: "Panduan awal seleksi SPCP IPDN 2026: persyaratan nilai dan fisik, portal pendaftaran, tahapan SKD sampai Pantukhir, serta batasan penggunaan data historis.",
-    snippet: "IPDN 2026 menggunakan pendaftaran sekolah kedinasan melalui SSCASN dan portal SPCP IPDN. Ringkasan ini memuat nilai ijazah, tinggi badan, tahapan tes, serta sumber resmi yang perlu diverifikasi.",
+    summary: "Panduan awal seleksi SPCP IPDN 2026: persyaratan nilai dan kesehatan, portal pendaftaran, tahapan SKD sampai Pantukhir, serta batasan penggunaan data historis.",
+    snippet: "IPDN 2026 menggunakan pendaftaran sekolah kedinasan melalui SSCASN dan portal SPCP IPDN. Ringkasan ini memuat syarat akademik, kesehatan, tahapan tes, serta sumber resmi yang perlu diverifikasi.",
     highlights: [
       "Portal pendaftaran terpadu: SSCASN DIKDIN BKN; instruksi lanjutan tersedia di SPCP IPDN.",
       "Ringkasan 2026 mencatat nilai rata-rata ijazah minimal 73,00 dan Bahasa Inggris minimal 75,00.",
@@ -52,6 +52,15 @@ export const GENERATED_KEDINASAN_ARTICLES = [
           "Tinggi badan minimal 160 cm untuk pria dan 155 cm untuk wanita.",
           "Tidak menggunakan kacamata atau lensa kontak menurut ringkasan kesehatan internal; penetapan akhir mengikuti tim medis resmi.",
           "Menyiapkan dokumen identitas, ijazah/SKL, pasfoto, serta dokumen khusus formasi yang tercantum pada pengumuman."
+        ]
+      },
+      {
+        heading: "Persyaratan kesehatan IPDN",
+        bullets: [
+          "Ringkasan 2026 mencatat tinggi badan minimal 160 cm untuk pria dan 155 cm untuk wanita.",
+          "Ringkasan internal mencatat ketentuan penglihatan dan penggunaan kacamata/lensa kontak; jangan menjadikannya keputusan kelulusan sebelum membaca juknis resmi.",
+          "Tahapan kesehatan, kesamaptaan, dan antropometri dilakukan oleh panitia atau tim medis yang ditunjuk.",
+          "Jika siswa memiliki kondisi medis atau riwayat cedera, arahkan untuk berkonsultasi ke dokter dan konfirmasi ke panitia SPCP IPDN."
         ]
       },
       {
@@ -112,7 +121,7 @@ export const GENERATED_KEDINASAN_ARTICLES = [
       "pendaftaran stin", "jadwal pendaftaran stin", "syarat stin",
       "seleksi stin", "tes stin", "kuota stin"
     ],
-    summary: "Panduan awal penerimaan STIN 2026 berdasarkan ringkasan persyaratan dan formasi internal, dengan penekanan pada verifikasi portal PTB STIN dan pengumuman resmi.",
+    summary: "Panduan awal penerimaan STIN 2026 berdasarkan ringkasan persyaratan dan formasi internal, dengan penekanan pada persyaratan kesehatan dan verifikasi portal PTB STIN.",
     snippet: "Ringkasan STIN 2026 mencatat tiga kelompok program, persyaratan nilai, dokumen, kesehatan, kebugaran, dan tahapan SKB. Semua angka perlu diverifikasi pada pengumuman PTB STIN terbaru.",
     highlights: [
       "Pendaftaran sekolah kedinasan dimulai melalui SSCASN DIKDIN BKN dan mengikuti instruksi PTB STIN.",
@@ -145,6 +154,15 @@ export const GENERATED_KEDINASAN_ARTICLES = [
           "Usia minimal 16 tahun dan maksimal 21 tahun 0 bulan 0 hari per 31 Desember 2026 pada ringkasan internal.",
           "Tinggi badan yang dicatat: diutamakan minimal 165 cm pria dan 160 cm wanita; kondisi di bawah angka tersebut memerlukan prestasi/kemampuan unggul yang dapat dibuktikan menurut ringkasan.",
           "Dokumen yang dicatat antara lain SKCK dan BPJS Kesehatan."
+        ]
+      },
+      {
+        heading: "Persyaratan kesehatan STIN",
+        bullets: [
+          "Ringkasan internal mencatat pemeriksaan kesehatan fisik dan jiwa serta tes kesegaran jasmani pada seleksi lanjutan.",
+          "Ringkasan juga mencatat ketentuan tinggi badan; angka dan toleransinya harus dikonfirmasi pada pengumuman PTB STIN terbaru.",
+          "Tes kesehatan dan kebugaran dinilai panitia atau tim medis resmi. SA tidak dapat menyimpulkan kelayakan siswa dari konsultasi awal.",
+          "Untuk kondisi medis, penglihatan, atau riwayat cedera, arahkan siswa ke dokter dan portal resmi STIN."
         ]
       },
       {
@@ -300,8 +318,8 @@ export const GENERATED_KEDINASAN_ARTICLES = [
       "tinggi badan sekolah kedinasan", "flatfoot kedinasan", "kacamata sekolah kedinasan",
       "medical check up kedinasan"
     ],
-    summary: "Panduan konsultasi awal untuk membandingkan aspek kesehatan sekolah kedinasan tanpa menggantikan pemeriksaan atau keputusan tim medis resmi.",
-    snippet: "Batas tinggi badan, mata, buta warna, kebugaran, dan kondisi medis berbeda antar sekolah kedinasan. Gunakan matriks ini sebagai pertanyaan awal lalu verifikasi pada pengumuman instansi.",
+    summary: "Panduan konsultasi awal untuk mengenali aspek kesehatan sekolah kedinasan tanpa menggantikan pemeriksaan atau keputusan tim medis resmi.",
+    snippet: "Tinggi badan, penglihatan, buta warna, kebugaran, dan kondisi medis perlu dikonfirmasi pada sekolah kedinasan yang dituju. Gunakan checklist ini untuk menyiapkan pertanyaan ke panitia.",
     highlights: [
       "Dokumen kesehatan di knowledge base adalah rangkuman internal, bukan regulasi medis.",
       "Tidak ada satu standar kesehatan yang berlaku untuk semua sekolah kedinasan.",
@@ -315,16 +333,18 @@ export const GENERATED_KEDINASAN_ARTICLES = [
         body: "Tanyakan sekolah tujuan, jalur, dan tahun seleksi. Gunakan informasi di bawah ini untuk menentukan dokumen atau pertanyaan yang perlu dikonfirmasi, bukan untuk memberikan diagnosis atau keputusan kelulusan."
       },
       {
-        heading: "Perbandingan aspek yang tercatat",
-        table: [
-          ["Aspek", "IPDN", "STIN", "Poltek SSN", "STIS", "STMKG", "Kemenhub"],
-          ["Tinggi badan", "Pria 160; wanita 155 cm", "Pria 165; wanita 160 cm (ringkasan)", "Pria 160; wanita 150 cm", "Tidak dicatat sebagai batas minimal", "Pria 155; wanita 150 cm", "Pria 160; wanita 155 cm; prodi penerbangan lebih tinggi"],
-          ["Buta warna", "Tidak boleh parsial/total", "Tidak boleh parsial/total", "Tidak boleh parsial/total", "Tidak boleh parsial/total", "Tidak boleh parsial/total", "Tidak boleh"],
-          ["Refraksi", "Tidak boleh minus pada ringkasan", "Toleransi sekitar 1 dioptri pada ringkasan", "Kacamata diperbolehkan", "Sekitar 6 dioptri pada ringkasan", "Sferis maksimal -4 D; silinder -2 D", "Tidak boleh minus pada ringkasan"],
-          ["Flatfoot total", "Tidak diperbolehkan", "Tidak diperbolehkan", "Tidak diperbolehkan", "Tidak diperbolehkan", "Tidak diperbolehkan", "Tidak diperbolehkan"],
-          ["Epilepsi", "Dicatat menggugurkan", "Dicatat menggugurkan", "Dicatat menggugurkan", "Dicatat menggugurkan", "Dicatat menggugurkan", "Dicatat menggugurkan"]
-        ],
-        tableHeader: true
+        heading: "Aspek kesehatan yang perlu dikonfirmasi",
+        bullets: [
+          "Tinggi dan berat badan, termasuk tanggal atau cara pengukuran yang ditetapkan panitia.",
+          "Penglihatan, termasuk buta warna, penggunaan kacamata atau lensa kontak, dan batas refraksi jika dicantumkan.",
+          "Pemeriksaan fisik, laboratorium, mata, gigi, jantung, kesehatan jiwa, atau pemeriksaan lain sesuai institusi.",
+          "Tes kebugaran seperti lari, push up, sit up, pull up/chinning, shuttle run, atau bentuk lain yang ditetapkan sekolah.",
+          "Dokumen kesehatan, surat keterangan, dan fasilitas pemeriksaan yang diakui panitia."
+        ]
+      },
+      {
+        heading: "Cara membaca perbedaan antar sekolah",
+        body: "Jika siswa menyebut IPDN, STIN, STIS, STMKG, Poltek SSN, atau Kemenhub, buka artikel sekolah tersebut. Gunakan bagian kesehatan di artikel itu hanya untuk informasi yang memiliki sumber dan tahun yang jelas. Jika detail belum tersedia, tandai sebagai hal yang harus dikonfirmasi ke panitia; jangan mengisi kekosongan dengan aturan sekolah lain."
       },
       {
         heading: "Pemeriksaan dan kebugaran",

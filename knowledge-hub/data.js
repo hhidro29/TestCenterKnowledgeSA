@@ -3,6 +3,7 @@ import { UNIVERSITY_CATALOG, NON_UI_STUDY_PROGRAMS } from "./university-catalog.
 import { GENERATED_ADMISSIONS_ARTICLES } from "./generated-articles-admissions.js";
 import { GENERATED_KEDINASAN_ARTICLES } from "./generated-articles-kedinasan.js";
 import { GENERATED_TKA_INTERNAL_ARTICLES } from "./generated-articles-tka-internal.js";
+import { KEDINASAN_HEALTH_ROUTING } from "./kedinasan-health-routing.js";
 
 // Content is intentionally separate from the UI so future iterations can
 // replace this module with a CMS, JSON endpoint, or database-backed API.
@@ -21673,6 +21674,14 @@ for (let index = KNOWLEDGE.length - 1; index >= 0; index -= 1) {
   if (generatedArticleIds.has(KNOWLEDGE[index].id)) KNOWLEDGE.splice(index, 1);
 }
 KNOWLEDGE.push(...generatedArticleRecords);
+Object.entries(KEDINASAN_HEALTH_ROUTING).forEach(([articleId, config]) => {
+  const article = KNOWLEDGE.find((item) => item.id === articleId);
+  if (!article) return;
+  article.aliases = [...new Set([...(article.aliases || []), ...(config.aliases || [])])];
+  if (config.section && !(article.sections || []).some((section) => section.heading === config.section.heading)) {
+    article.sections = [...(article.sections || []), config.section];
+  }
+});
 KNOWLEDGE.push(...FAQ_RECORDS);
 
 export const POPULAR_SEARCHES = [

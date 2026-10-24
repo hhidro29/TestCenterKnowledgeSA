@@ -46,6 +46,12 @@ const cases = [
   , ["pelajaran ilmu komputer", "study-program-institut-pertanian-bogor-ilmu-komputer", "Bidang yang dipelajari"]
   , ["mata kuliah psikologi", "study-program-universitas-gadjah-mada-psikologi", "Bidang yang dipelajari"]
   , ["prospek kerja arsitektur UI", "study-program-universitas-indonesia-arsitektur", "Prospek kerja"]
+  , ["syarat kesehatan IPDN", "ipdn-2026", "kesehatan IPDN"]
+  , ["kesehatan STIN", "stin-2026", "Konteks"]
+  , ["kesehatan SIPENCATAR", "sipencatar-kemenhub-2026", "kesehatan SIPENCATAR"]
+  , ["kesehatan Poltekimipas", "poltekimipas-2026", "Pendaftaran"]
+  , ["kesehatan PKN STAN", "stan-2026", "kebugaran PKN STAN"]
+  , ["buta warna kedinasan", "ketentuan-kesehatan-sekolah-kedinasan-2026", "Ringkasan"]
 ];
 
 let failures = 0;

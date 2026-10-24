@@ -51,3 +51,16 @@ Gunakan query di bawah satu per satu pada halaman search. Hasil yang diharapkan 
 - Untuk query dengan tahun atau jadwal, buka artikel dan baca metadata verifikasinya sebelum menyampaikan informasi kepada siswa.
 - Artikel internal BAC dan artikel penerimaan yang bersumber dari arsip masih perlu direview pemilik konten sebelum dianggap sebagai panduan aktif.
 - Ops Note tidak termasuk dalam daftar ini karena format announcement-nya masih di-hold.
+
+## Uji routing sekolah kedinasan yang spesifik
+
+Query berikut harus membuka artikel sekolah yang disebut, bukan hanya panduan kesehatan umum:
+
+| Input search | Artikel yang diharapkan |
+|---|---|
+| `syarat kesehatan IPDN` | Masuk IPDN 2026 — Persyaratan kesehatan IPDN |
+| `kesehatan STIN` | Masuk STIN 2026 |
+| `kesehatan SIPENCATAR` | SIPENCATAR Kemenhub 2026 — Persyaratan kesehatan SIPENCATAR Kemenhub |
+| `kesehatan Poltekimipas` | Masuk Politeknik Imigrasi dan Pemasyarakatan 2026 |
+| `kesehatan PKN STAN` | Masuk PKN STAN 2026 — Kesehatan dan kebugaran PKN STAN |
+| `buta warna kedinasan` | Ketentuan Kesehatan Sekolah Kedinasan — panduan umum |
