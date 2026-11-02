@@ -1,0 +1,9 @@
+{
+  "name": "sa-handbook-v2-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check client.js && node --check handbook-v2.js && node handbook-versioning-acceptance.mjs"
+  }
+}
